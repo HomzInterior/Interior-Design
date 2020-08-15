@@ -1,0 +1,25 @@
+our Account Details
+
+Your account is now active.
+Main Hosting Details
+Control panel username
+b32_26444980
+Control panel password	**********
+Control panel URL
+cpanel.byethost32.com
+MySQL username
+b32_26444980
+MySQL password
+**********
+MySQL hostname
+sql302.byethost32.com
+FTP username
+b32_26444980
+FTP password
+**********
+FTP host name	ftp.byethost32.com
+
+
+Your Website URL's
+Home page
+http://myhomeinteriors.byethost32.com
