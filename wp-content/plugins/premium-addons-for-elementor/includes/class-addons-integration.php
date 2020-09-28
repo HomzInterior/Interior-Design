@@ -23,6 +23,13 @@ class Addons_Integration {
     //Maps Keys
     private static $maps = null;
     
+    	/**
+	 * Cross-Site CDN URL.
+	 *
+	 * @since  1.24.1
+	 * @var (String) URL
+	 */
+	public $cdn_url;
     
     /**
     * Initialize integration hooks
@@ -37,7 +44,7 @@ class Addons_Integration {
         
         $this->templateInstance = Includes\premium_Template_Tags::getInstance();
         
-        add_action( 'elementor/editor/before_enqueue_styles', array( $this, 'premium_font_setup' ) );
+        add_action( 'elementor/editor/before_enqueue_styles', array( $this, 'enqueue_editor_styles' ) );
         
         add_action( 'elementor/widgets/widgets_registered', array( $this, 'widgets_area' ) );
         
@@ -50,7 +57,16 @@ class Addons_Integration {
         add_action( 'elementor/frontend/after_register_scripts', array( $this, 'register_frontend_scripts' ) );
         
         add_action( 'wp_ajax_get_elementor_template_content', array( $this, 'get_template_content' ) );
-        
+
+        // $cross_enabled = isset( self::$modules['premium-cross-domain'] ) ? self::$modules['premium-cross-domain'] : 1;
+
+		// if( $cross_enabled ) {
+
+		// 	add_action( 'elementor/editor/before_enqueue_scripts', array( $this, 'enqueue_editor_cp_scripts' ) );
+        //     require_once PREMIUM_ADDONS_PATH  . 'includes/class-addons-cross-cp.php';
+            
+		// }
+                    
     }
     
     /**
@@ -59,14 +75,28 @@ class Addons_Integration {
     * @access public
     * @return void
     */
-    public function premium_font_setup() {
+    public function enqueue_editor_styles() {
+
+        $theme =  Helper_Functions::get_elementor_ui_theme();
         
         wp_enqueue_style(
-            'premium-addons-font',
+            'pa-editor',
             PREMIUM_ADDONS_URL . 'assets/editor/css/style.css',
             array(),
             PREMIUM_ADDONS_VERSION
         );
+
+        //Enqueue required style for Elementor dark UI Theme
+        if( 'dark' === $theme ) {
+
+            wp_enqueue_style(
+                'pa-editor-dark',
+                PREMIUM_ADDONS_URL . 'assets/editor/css/style-dark.css',
+                array(),
+                PREMIUM_ADDONS_VERSION
+            );
+
+        }
         
         $badge_text = Helper_Functions::get_badge();
         
@@ -272,7 +302,7 @@ class Addons_Integration {
             PREMIUM_ADDONS_VERSION, 
             true
         );
-       
+
        if( $maps_settings['premium-map-cluster'] ) {
             wp_register_script(
                 'google-maps-cluster',
@@ -344,6 +374,43 @@ class Addons_Integration {
         }
 
     }
+
+    /**
+	* Load Cross Domain Copy Paste JS Files.
+	*
+	* @since 3.21.1
+	*/
+
+	public function enqueue_editor_cp_scripts() {
+
+		$dir = Helper_Functions::get_scripts_dir();
+        $suffix = Helper_Functions::get_assets_suffix();
+        
+		wp_enqueue_script(
+			'premium-xdlocalstorage-js',
+			PREMIUM_ADDONS_URL . 'assets/editor/js/xdlocalstorage.js',
+			null,
+            PREMIUM_ADDONS_VERSION,
+			true
+		);
+
+		wp_enqueue_script(
+			'premium-cross-cp',
+			PREMIUM_ADDONS_URL . 'assets/editor/js/premium-cross-cp.js',
+			array( 'jquery', 'elementor-editor', 'premium-xdlocalstorage-js' ),
+			PREMIUM_ADDONS_VERSION,
+			true
+        );
+        
+		wp_localize_script(
+		'jquery',
+			'premium_cross_cp',
+			array(
+				'ajax_url' => admin_url( 'admin-ajax.php' ),
+				'nonce'    => wp_create_nonce( 'premium_cross_cp_import' ),
+			)
+		);
+	}
     
     /*
      * Get Template Content

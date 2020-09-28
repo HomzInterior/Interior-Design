@@ -15,7 +15,7 @@ if ( ! function_exists( 'oceanwp_theme_strings' ) ) {
 	/**
 	 * OceanWP Theme Strings
 	 *
-	 *  @author Amit Singh (@apprimit)
+	 *  @author Amit Singh (apprimit@gmail.com)
 	 *  @since 1.8.5
 	 *
 	 * @param  string  $value  String key.
@@ -33,7 +33,7 @@ if ( ! function_exists( 'oceanwp_theme_strings' ) ) {
 				'owp-string-mobile-search-text'          => apply_filters( 'ocean_mobile_search_text', __( 'Search', 'oceanwp' ) ),
 				'owp-string-mobile-fs-search-text'       => apply_filters( 'ocean_mobile_fs_search_text', __( 'Type your search', 'oceanwp' ) ),
 				'owp-string-header-replace-search-text'  => apply_filters( 'ocean_header_replace_search_text', __( 'Type then hit enter to search...', 'oceanwp' ) ),
-				'owp-string-search-overlay-search-text'  => apply_filters( 'ocean_search_overlay_search_text', __( 'Type then hit enter to search...', 'oceanwp' ) ),
+				'owp-string-search-overlay-search-text'  => apply_filters( 'ocean_search_overlay_search_text', __( 'Type then hit enter to search', 'oceanwp' ) ),
 				'owp-string-vertical-header-search-text' => apply_filters( 'ocean_vertical_header_search_text', __( 'Search...', 'oceanwp' ) ),
 				'owp-string-medium-header-search-text'   => apply_filters( 'ocean_medium_header_search_text', __( 'Search...', 'oceanwp' ) ),
 				'owp-string-comment-logout-text'         => apply_filters( 'ocean_comment_logout_text', __( 'Log out of this account', 'oceanwp' ) ),
@@ -58,7 +58,6 @@ if ( ! function_exists( 'oceanwp_theme_strings' ) ) {
 				'owp-string-woo-floating-bar-select-btn' => apply_filters( 'ocean_woo_floating_bar_select_btn', __( 'Select Options', 'oceanwp' ) ),
 				'owp-string-woo-floating-bar-selected'   => apply_filters( 'ocean_woo_floating_bar_selected', __( 'Selected:', 'oceanwp' ) ),
 				'owp-string-woo-floating-bar-out-stock'  => apply_filters( 'ocean_woo_floating_bar_out_stock', __( 'Out of stock', 'oceanwp' ) ),
-
 			)
 		);
 

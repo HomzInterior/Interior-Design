@@ -266,7 +266,8 @@ class Premium_Maps extends Widget_Base {
                     'pin_title'         => __('Premium Google Maps', 'premium-addons-for-elementor'),
                     'pin_desc'          => __('Add an optional description to your map pin', 'premium-addons-for-elementor'),
                 ],
-                'fields'       => array_values( $repeater->get_controls() ),
+                'fields'       => $repeater->get_controls(),
+                'title_field'   => '{{{ pin_title }}}'
             ]
         );
         
@@ -326,6 +327,13 @@ class Premium_Maps extends Widget_Base {
                     ],
                 ]
                 );
+
+        $this->add_control('disable_drag',
+            [
+                'label'         => __( 'Disable Map Drag', 'premium-addons-for-elementor' ),
+                'type'          => Controls_Manager::SWITCHER,
+            ]
+        );
         
         $this->add_control('premium_maps_map_option_map_type_control',
                 [
@@ -738,7 +746,8 @@ class Premium_Maps extends Widget_Base {
             'automaticOpen'         => $automatic_open,
             'hoverOpen'             => $hover_open,
             'hoverClose'            => $hover_close,
-            'cluster'               => $marker_cluster
+            'cluster'               => $marker_cluster,
+            'drag'                  => $settings['disable_drag']
         ];
         
         $this->add_render_attribute('style_wrapper', 'data-style', $settings['premium_maps_custom_styling']);

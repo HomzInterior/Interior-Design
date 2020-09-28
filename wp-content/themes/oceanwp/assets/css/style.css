@@ -94,7 +94,7 @@ blockquote, q {
 }
 
 a:focus {
-  outline: 0;
+  outline: 1.5px solid #323232;
 }
 
 a:hover, a:active {
@@ -310,6 +310,8 @@ form.oceanwp-searchform button {
           clip-path: inset(50%);
   height: 1px;
   margin: -1px;
+  font-size: 14px !important;
+  font-weight: 400;
   overflow: hidden;
   padding: 0;
   position: absolute !important;
@@ -6492,6 +6494,15 @@ body.breadcrumbs-position-default .page-header-title {
   margin-left: 8px;
 }
 
+.has-blog-grid .blog-grid {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  margin: 0 auto;
+  height: auto !important;
+}
+
 .blog-entry.grid-entry {
   float: left;
 }
@@ -8407,7 +8418,6 @@ body .elementor-element.elementor-wc-products ul.products li.product.circle-sale
   color: #555;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
-     -moz-user-select: none;
       -ms-user-select: none;
           user-select: none;
   -webkit-overflow-scrolling: touch;

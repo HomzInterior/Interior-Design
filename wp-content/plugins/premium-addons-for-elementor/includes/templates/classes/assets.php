@@ -119,6 +119,7 @@ if( ! class_exists('Premium_Templates_Assets') ) {
             wp_localize_script( 'premium-temps-editor', 'PremiumTempsData', apply_filters(
                'premium-templates-core/assets/editor/localize',
                 array(
+                    'Elementor_Version'     => ELEMENTOR_VERSION,
                     'PremiumTemplatesBtn'   => $button,
                     'modalRegions'          => $this->get_modal_region(),
                     'license'               => array(

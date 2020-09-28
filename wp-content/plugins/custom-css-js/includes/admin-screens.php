@@ -125,6 +125,9 @@ class CustomCSSandJS_Admin {
 		$cm = $a . '/codemirror';
 		$v  = CCJ_VERSION;
 
+		wp_enqueue_script( 'ccj-tipsy', $a . '/jquery.tipsy.js', array( 'jquery' ), $v, false );
+		wp_enqueue_style( 'ccj-tipsy', $a . '/tipsy.css', array(), $v );
+		wp_enqueue_script( 'ccj-cookie', $a . '/js.cookie.js', array( 'jquery' ), $v, false );
 		wp_register_script( 'ccj-admin', $a . '/ccj_admin.js', array( 'jquery', 'jquery-ui-resizable' ), $v, false );
 		wp_localize_script( 'ccj-admin', 'CCJ', $this->cm_localize() );
 		wp_enqueue_script( 'ccj-admin' );
@@ -153,7 +156,9 @@ class CustomCSSandJS_Admin {
 			wp_enqueue_script( 'cm-search', $cma . 'search/search.js', array( 'ccj-codemirror' ), $v, false );
 			wp_enqueue_script( 'cm-searchcursor', $cma . 'search/searchcursor.js', array( 'ccj-codemirror' ), $v, false );
 			wp_enqueue_script( 'cm-jump-to-line', $cma . 'search/jump-to-line.js', array( 'ccj-codemirror' ), $v, false );
+			wp_enqueue_script( 'ccj-fullscreen', $cma . 'display/fullscreen.js', array( 'ccj-codemirror' ), $v, false );
 			wp_enqueue_style( 'cm-dialog', $cma . 'dialog/dialog.css', array(), $v );
+			wp_enqueue_script( 'ccj-formatting', $cm . '/lib/util/formatting.js', array( 'ccj-codemirror' ), $v, false );
 			wp_enqueue_script( 'ccj-comment', $cma . 'comment/comment.js', array( 'ccj-codemirror' ), $v, false );
 
 			// Hint Addons
@@ -177,6 +182,7 @@ class CustomCSSandJS_Admin {
 					&& strstr( $_value->src, 'plugins/custom-css-js/assets' ) === false
 					&& strstr( $_value->src, 'plugins/advanced-custom-fields/' ) === false
 					&& strstr( $_value->src, 'plugins/wp-jquery-update-test/' ) === false
+					&& strstr( $_value->src, 'plugins/enable-jquery-migrate-helper/' ) === false
 					&& strstr( $_value->src, 'plugins/advanced-custom-fields-pro/' ) === false ) {
 						unset( $wp_scripts->registered[ $_key ] );
 					}
@@ -754,6 +760,15 @@ End of comment */ ',
 
 		?>
 			  <form style="position: relative; margin-top: .5em;">
+
+				<div class="code-mirror-buttons">
+				<div class="button-left"><span rel="tipsy" original-title="<?php _e( 'Beautify Code', 'custom-css-js-pro' ); ?>"><button type="button" tabindex="-1" id="ccj-beautifier"><i class="ccj-i-beautifier"></i></button></span></div>
+				<!--div class="button-left"><span rel="tipsy" original-title="<?php _e( 'Editor Settings', 'custom-css-js-pro' ); ?>"><button type="button" tabindex="-1" id="ccj-settings"><i class="ccj-i-settings"></i></button></span></div -->
+				<div class="button-right" id="ccj-fullscreen-button" alt="<?php _e( 'Distraction-free writing mode', 'custom-css-js-pro' ); ?>"><span rel="tipsy" original-title="<?php _e( 'Fullscreen', 'custom-css-js-pro' ); ?>"><button role="presentation" type="button" tabindex="-1"><i class="ccj-i-fullscreen"></i></button></span></div>
+<input type="hidden" name="fullscreen" id="ccj-fullscreen-hidden" value="false" />
+<!-- div class="button-right" id="ccj-search-button" alt="Search"><button role="presentation" type="button" tabindex="-1"><i class="ccj-i-find"></i></button></div -->
+
+				</div>
 
 				<div class="code-mirror-before"><div><?php echo htmlentities( $code_mirror_before ); ?></div></div>
 				<textarea class="wp-editor-area" id="ccj_content" mode="<?php echo htmlentities( $code_mirror_mode ); ?>" name="content"><?php echo $post->post_content; ?></textarea>

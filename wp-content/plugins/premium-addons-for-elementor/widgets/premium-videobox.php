@@ -55,6 +55,7 @@ class Premium_Videobox extends Widget_Base {
     
     public function get_script_depends() {
         return [
+            'elementor-waypoints',
             'premium-addons-js'
         ];
     }
@@ -224,6 +225,83 @@ class Premium_Videobox extends Widget_Base {
                 'label'         => __('Loop', 'premium-addons-for-elementor'),
                 'type'          => Controls_Manager::SWITCHER,
             ]
+        );
+
+        $this->add_control('premium_video_box_sticky_switcher',
+            [
+                'label'         => __('Sticky', 'premium-addons-for-elementor'),
+                'type'          => Controls_Manager::HIDDEN,
+            ]
+        );
+
+        $this->add_control(
+            'premium_video_box_sticky_position',
+            array(
+                'label'        => __( 'Position', 'premium-addons-for-elementor' ),
+                'type'         => Controls_Manager::SELECT,
+                'options'      => array(
+                    'top-left'     => __( 'Top Left', 'premium-addons-for-elementor' ),
+                    'top-right'    => __( 'Top Right', 'premium-addons-for-elementor' ),
+                    'bottom-left'  => __( 'Bottom Left', 'premium-addons-for-elementor' ),
+                    'bottom-right' => __( 'Bottom Right', 'premium-addons-for-elementor' ),
+                    'center-left'  => __( 'Center Left', 'premium-addons-for-elementor' ),
+                    'center-right' => __( 'Center Right', 'premium-addons-for-elementor' ),
+                ),
+                'default'      => 'bottom-left',
+                'condition' => [
+                    'premium_video_box_sticky_switcher' => 'yes',
+                ],
+                'prefix_class' => 'premium-video-sticky-',
+                'render_type'  => 'template',
+            )
+        );
+
+        $this->add_control(
+            'premium_video_box_sticky_hide',
+            array(
+                'label'              => __( 'Disable Sticky On', 'premium-addons-for-elementor' ),
+                'type'               => Controls_Manager::SELECT2,
+                'multiple'           => true,
+                'label_block'        => true,
+                'options'            => array(
+                    'desktop' => __( 'Desktop', 'premium-addons-for-elementor' ),
+                    'tablet'  => __( 'Tablet', 'premium-addons-for-elementor' ),
+                    'mobile'  => __( 'Mobile', 'premium-addons-for-elementor' ),
+                ),
+                'condition' => [
+                    'premium_video_box_sticky_switcher' => 'yes',
+                ],
+                'render_type'        => 'template',
+                'frontend_available' => true,
+            )
+        );
+
+        $this->add_control(
+            'sticky_info_bar_switch',
+            array(
+                'label'       => __( 'Info Section', 'premium-addons-for-elementor' ),
+                'type'        => Controls_Manager::SWITCHER,
+                'condition' => [
+                    'premium_video_box_sticky_switcher' => 'yes',
+                ],
+            )
+        );
+
+        $this->add_control(
+            'sticky_info_bar_text',
+            array(
+                'label'     => __( 'Text', 'premium-addons-for-elementor' ),
+                'type'      => Controls_Manager::TEXTAREA,
+                'default'   => 'Watching : Short Video',
+                'rows'      => 2,
+                'dynamic'   => array(
+                    'active' => true,
+                ),
+                'condition' => array(
+                    'premium_video_box_sticky_switcher' => 'yes',
+                    'sticky_info_bar_switch' => 'yes',
+                ),
+            )
         );
         
         $this->add_control('premium_video_box_start',
@@ -736,6 +814,163 @@ class Premium_Videobox extends Widget_Base {
         );
         
         $this->end_controls_section();
+
+        $this->start_controls_section('premium_video_box_sticky_options', 
+            [
+                'label'         => __('Sticky Options', 'premium-addons-for-elementor'),
+                'tab'           => Controls_Manager::TAB_STYLE,
+                'condition'     => [
+                    'premium_video_box_sticky_switcher'  => 'yes',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'sticky_video_width',
+            array(
+                'label'          => __( 'Video Size', 'premium-addons-for-elementor' ),
+                'type'           => Controls_Manager::SLIDER,
+                'range'          => array(
+                    'px' => array(
+                        'min' => 100,
+                        'max' => 1000,
+                    ),
+                ),
+                'default'        => array(
+                    'size' => 320,
+                    'unit' => 'px',
+                ),
+                'mobile_default' => array(
+                    'size' => 250,
+                    'unit' => 'px',
+                ),
+              
+                'selectors'      => array(
+                    '{{WRAPPER}}.pa-aspect-ratio-169 .premium-video-box-container.premium-video-box-sticky-apply .premium-video-box-inner-wrap, 
+                    {{WRAPPER}}.pa-aspect-ratio-169 .premium-video-box-sticky-apply .premium-video-box-image-container' => 'width: {{SIZE}}px; height: calc( {{SIZE}}px * 0.5625 );',
+                    '{{WRAPPER}}.pa-aspect-ratio-43 .premium-video-box-container.premium-video-box-sticky-apply .premium-video-box-inner-wrap, 
+                    {{WRAPPER}}.pa-aspect-ratio-43 .premium-video-box-sticky-apply .premium-video-box-image-container' => 'width: {{SIZE}}px; height: calc( {{SIZE}}px * 0.75 );',
+                    '{{WRAPPER}}.pa-aspect-ratio-32 .premium-video-box-container.premium-video-box-sticky-apply .premium-video-box-inner-wrap, 
+                    {{WRAPPER}}.pa-aspect-ratio-32 .premium-video-box-sticky-apply .premium-video-box-image-container' => 'width: {{SIZE}}px; height: calc( {{SIZE}}px * 0.6666666666666667 );',
+                    '{{WRAPPER}}.pa-aspect-ratio-916 .premium-video-box-container.premium-video-box-sticky-apply .premium-video-box-inner-wrap, 
+                    {{WRAPPER}}.pa-aspect-ratio-916 .premium-video-box-sticky-apply .premium-video-box-image-container' => 'width: {{SIZE}}px; height: calc( {{SIZE}}px * 0.1778 );',
+                    '{{WRAPPER}}.pa-aspect-ratio-11 .premium-video-box-container.premium-video-box-sticky-apply .premium-video-box-inner-wrap, 
+                    {{WRAPPER}}.pa-aspect-ratio-11 .premium-video-box-sticky-apply .premium-video-box-image-container' => 'width: {{SIZE}}px; height: calc( {{SIZE}}px * 1 );',
+                    '{{WRAPPER}}.pa-aspect-ratio-219 .premium-video-box-container.premium-video-box-sticky-apply .premium-video-box-inner-wrap, 
+                    {{WRAPPER}}.pa-aspect-ratio-219 .premium-video-box-sticky-apply .premium-video-box-image-container' => 'width: {{SIZE}}px; height: calc( {{SIZE}}px * 0.4285 );',
+                ),
+            )
+        );
+
+        $this->add_responsive_control(
+            'sticky_video_margin',
+            array(
+                'label'              => __( 'Spaces Around', 'premium-addons-for-elementor' ),
+                'type'               => Controls_Manager::DIMENSIONS,
+                'size_units'         => array( 'px' ),
+                'selectors'          => array(
+                    '{{WRAPPER}}.premium-video-sticky-top-right .premium-video-box-sticky-apply .premium-video-box-inner-wrap' => 'top: {{TOP}}{{UNIT}}; right: {{RIGHT}}{{UNIT}};',
+                    '{{WRAPPER}}.premium-video-sticky-top-left .premium-video-box-sticky-apply .premium-video-box-inner-wrap' => 'top: {{TOP}}{{UNIT}}; left: {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}}.premium-video-sticky-bottom-right .premium-video-box-sticky-apply .premium-video-box-inner-wrap' => 'bottom: {{BOTTOM}}{{UNIT}}; right: {{RIGHT}}{{UNIT}};',
+                    '{{WRAPPER}}.premium-video-sticky-bottom-left .premium-video-box-sticky-apply .premium-video-box-inner-wrap' => 'bottom: {{BOTTOM}}{{UNIT}}; left: {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}}.premium-video-sticky-center-left .premium-video-box-sticky-apply .premium-video-box-inner-wrap' => 'left: {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}}.premium-video-sticky-center-right .premium-video-box-sticky-apply .premium-video-box-inner-wrap' => 'right: {{RIGHT}}{{UNIT}};',
+                ),
+                'render_type'        => 'template',
+                'frontend_available' => true,
+                'seperator' => 'after'
+            )
+        );
+
+        $this->add_control(
+            'premium_video_box_sticky_close_color',
+            [
+                'label' => __('Icon Color', 'premium-addons-for-elementor'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .premium-video-box-sticky-close' => 'color: {{VALUE}}!important',
+                ],
+                'scheme'        => [
+                    'type'  => Scheme_Color::get_type(),
+                    'value' => Scheme_Color::COLOR_2,
+                ],
+                'seperator' => 'after'
+            ]
+        );
+
+        $this->add_responsive_control(
+            'sticky_video_icon_size',
+            [
+                'label'          => __( 'Icon Size', 'premium-addons-for-elementor' ),
+                'type'           => Controls_Manager::SLIDER,
+                'default'        => [
+                    'size' => 20,
+                    'unit' => 'px',
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .premium-video-box-sticky-close i' => 'font-size: {{SIZE}}{{UNIT}}',
+                ],
+            ]
+        );
+        $this->add_control(
+            'sticky_hint',
+            [
+                'label'         => '<span style="line-height: 1.4em;">Info Section</span>',
+                'type'          => Controls_Manager::RAW_HTML,
+                'condition' => [  
+                'sticky_info_bar_switch' => 'yes',
+                ],
+                'separator' => 'before',
+            ]
+        );
+        $this->add_control(
+            'premium_video_box_sticky_info_color',
+            [
+                'label' => __('Text Color', 'premium-addons-for-elementor'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .premium-video-box-sticky-infobar' => 'color: {{VALUE}}',
+                ],
+                'scheme'        => [
+                    'type'  => Scheme_Color::get_type(),
+                    'value' => Scheme_Color::COLOR_2,
+                ],
+                'condition' => [  
+                    'sticky_info_bar_switch' => 'yes',
+                ]
+            ]
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name'          => 'info_typography',
+                'scheme'        => Scheme_Typography::TYPOGRAPHY_1,
+                'selector'      => '{{WRAPPER}} .premium-video-box-sticky-infobar',
+                'condition' => [  
+                    'sticky_info_bar_switch' => 'yes',
+                ]
+            ]
+        );
+
+        $this->add_control(
+            'premium_video_box_sticky_info_bg_color',
+            [
+                'label' => __('Background Color', 'premium-addons-for-elementor'),
+                'type' => \Elementor\Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .premium-video-box-sticky-apply .premium-video-box-sticky-infobar' => 'background: {{VALUE}}',
+                ],
+                'default' => '#FFF',
+                'condition' => [  
+                    'sticky_info_bar_switch' => 'yes',
+                ]
+            ]
+        );
+       
+
+        $this->end_controls_section();
+
     }
 
     /**
@@ -785,16 +1020,26 @@ class Premium_Videobox extends Widget_Base {
             }
         }
         
-        $link       = $params['link'];
+        $link           = $params['link'];
         
-        $related = $settings['premium_video_box_suggested_videos'];
+        $related        = $settings['premium_video_box_suggested_videos'];
         
-        $mute = $settings['premium_video_box_mute'];
+        $mute           = $settings['premium_video_box_mute'];
         
-        $loop = $settings['premium_video_box_loop'];
+        $loop           = $settings['premium_video_box_loop'];
         
-        $controls = $settings['premium_video_box_controls'];
+        $controls       = $settings['premium_video_box_controls'];
+
+        $sticky         = $settings['premium_video_box_sticky_switcher'];
+
+        $sticky_desktop = '';
+
+        $sticky_tablet  = '';
         
+        $sticky_mobile  = '';
+        
+		$sticky_infobar = ( 'yes' === $settings['sticky_info_bar_switch'] ) ? 'premium-video-box-sticky-infobar-wrap' : '';
+
         $options = 'youtube' === $video_type ? '&rel=' : '?rel';
         $options .= 'yes' === $related ? '1' : '0';
         $options .= 'youtube' === $video_type ? '&mute=' : '&muted=';
@@ -878,6 +1123,32 @@ class Premium_Videobox extends Widget_Base {
             
         }
         
+        if (  $settings['premium_video_box_sticky_hide'] ) {
+			foreach ( $settings['premium_video_box_sticky_hide'] as $element ) {
+				if ( 'desktop' === $element ) {
+					$sticky_desktop = 'desktop';
+				} elseif ( 'tablet' === $element ) {
+					$sticky_tablet = 'tablet';
+				} elseif ( 'mobile' === $element ) {
+					$sticky_mobile = 'mobile';
+				}
+			}
+        } 
+        
+        if( $sticky === "yes"){
+            $this->add_render_attribute('container', [
+                'class'            => $sticky_infobar,
+                'data-hide-desktop'=> $sticky_desktop,
+                'data-hide-tablet' => $sticky_tablet,
+                'data-hide-mobile' => $sticky_mobile,
+                'data-sticky'      => $sticky,
+                ]
+            );
+            if ( !empty( $settings['sticky_video_margin'] ) ) {
+                $this->add_render_attribute( 'container', 'data-sticky-margin', $settings['sticky_video_margin']['bottom']);
+            }
+        }
+
         $this->add_inline_editing_attributes( 'premium_video_box_description_text' );
         
         $this->add_render_attribute('container', [
@@ -885,7 +1156,7 @@ class Premium_Videobox extends Widget_Base {
                 'class' => 'premium-video-box-container',
                 'data-overlay'  => 'yes' === $settings['premium_video_box_image_switcher'] ? 'true' : 'false',
                 'data-type'     => $video_type,
-                'data-thumbnail' => !empty( $thumbnail )
+                'data-thumbnail' => !empty( $thumbnail ),
             ]
         );
         
@@ -905,24 +1176,30 @@ class Premium_Videobox extends Widget_Base {
 
     <div <?php echo $this->get_render_attribute_string('container'); ?>>
         <?php $this->get_vimeo_header( $params['id'] ); ?>
-        <div <?php echo $this->get_render_attribute_string('video_container'); ?>>
-            <?php if ( 'self' === $video_type ) : ?>
-                <video src="<?php echo esc_url( $hosted_url ); ?>" <?php echo $video_params; ?>></video>
+        <div class="premium-video-box-inner-wrap">
+            <div <?php echo $this->get_render_attribute_string('video_container'); ?>>
+                <?php if ( 'self' === $video_type ) : ?>
+                    <video src="<?php echo esc_url( $hosted_url ); ?>" <?php echo $video_params; ?>></video>
+                <?php endif; ?>
+            </div>
+                <div class="premium-video-box-image-container" style="background-image: <?php echo $image; ?>;"></div>
+                <?php if ( 'yes' === $sticky  ) { ?>
+                <span class="premium-video-box-sticky-close"><i class="fas fa-times-circle"></i></span>
+                <?php } ?>
+                <?php if ( 'yes' === $settings['sticky_info_bar_switch'] && '' !== $settings['sticky_info_bar_text'] ) { ?>
+                        <div class="premium-video-box-sticky-infobar"><?php echo wp_kses_post( $settings['sticky_info_bar_text'] ); ?></div>
+                <?php } ?>
+            <?php if( 'yes' === $settings['premium_video_box_play_icon_switcher'] && 'yes' !== $autoplay && !empty($thumbnail) ) : ?>
+                <div class="premium-video-box-play-icon-container">
+                    <i class="premium-video-box-play-icon fa fa-play fa-lg"></i>
+                </div>
+            <?php endif; ?>
+            <?php if( $settings['premium_video_box_video_text_switcher'] == 'yes' && !empty( $settings['premium_video_box_description_text'] ) ) : ?>
+                <div class="premium-video-box-description-container">
+                    <p class="premium-video-box-text"><span <?php echo $this->get_render_attribute_string('premium_video_box_description_text'); ?>><?php echo $settings['premium_video_box_description_text']; ?></span></p>
+                </div>
             <?php endif; ?>
         </div>
-            <div class="premium-video-box-image-container" style="background-image: <?php echo $image; ?>;">
-        </div>
-        
-        <?php if( 'yes' === $settings['premium_video_box_play_icon_switcher'] && 'yes' !== $autoplay && !empty($thumbnail) ) : ?>
-            <div class="premium-video-box-play-icon-container">
-                <i class="premium-video-box-play-icon fa fa-play fa-lg"></i>
-            </div>
-        <?php endif; ?>
-        <?php if( $settings['premium_video_box_video_text_switcher'] == 'yes' && !empty( $settings['premium_video_box_description_text'] ) ) : ?>
-            <div class="premium-video-box-description-container">
-                <p class="premium-video-box-text"><span <?php echo $this->get_render_attribute_string('premium_video_box_description_text'); ?>><?php echo $settings['premium_video_box_description_text']; ?></span></p>
-            </div>
-        <?php endif; ?>
     </div>
 
     <?php

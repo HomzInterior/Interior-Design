@@ -29,6 +29,9 @@ $classes = implode( ' ', $classes );
 // Menu Location.
 $menu_location = apply_filters( 'ocean_main_menu_location', 'main_menu' );
 
+// Dropdown menu attributes.
+$dropdown_menu_attrs = apply_filters( 'oceanwp_attrs_mobile_dropdown', '' );
+
 // Menu arguments.
 $menu_args = array(
 	'theme_location' => $menu_location,
@@ -61,9 +64,16 @@ $top_menu_args = array(
 	'theme_location' => $top_menu_location,
 	'container'      => false,
 	'fallback_cb'    => false,
-); ?>
+);
 
-<div id="mobile-dropdown" class="clr">
+// Get close menu text.
+$close_text = get_theme_mod( 'ocean_mobile_menu_close_text' );
+$close_text = oceanwp_tm_translation( 'ocean_mobile_menu_close_text', $close_text );
+$close_text = $close_text ? $close_text : esc_html__( 'Close', 'oceanwp' );
+
+?>
+
+<div id="mobile-dropdown" class="clr" <?php echo $dropdown_menu_attrs; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 
 	<nav class="<?php echo esc_attr( $classes ); ?>"<?php oceanwp_schema_markup( 'site_navigation' ); ?>>
 

@@ -334,7 +334,7 @@ class Premium_Grid extends Widget_Base {
                        'premium_gallery_img_cat'   => 'Category 2',
                    ],
                ],
-               'fields'             => array_values( $repeater->get_controls() ) ,
+               'fields'             => $repeater->get_controls(),
                'title_field'        => '{{{ premium_gallery_img_cat }}}',
                'condition'          => $condition
            ]
@@ -417,7 +417,7 @@ class Premium_Grid extends Widget_Base {
         $img_repeater->add_responsive_control('premium_gallery_image_cell',
 			[
   				'label'                 => __( 'Width', 'premium-addons-for-elementor' ),
-                'description'           => __('Works only when layout set to \'Metro\'', 'premium-addons-for-elementor'),
+                'description'           => __('Works only when layout set to Metro', 'premium-addons-for-elementor'),
 				'label_block'           => true,
                 'default'               => [
                     'unit'  => 'px',
@@ -539,8 +539,7 @@ class Premium_Grid extends Widget_Base {
                 'return_value'  => 'true',
                 'default'       => 'true',
                 'condition'     => [
-                    'premium_gallery_video'     => 'true',
-                    'premium_gallery_video_type!'=> 'vimeo'
+                    'premium_gallery_video'     => 'true'
                 ]
             ]
         );
@@ -659,7 +658,7 @@ class Premium_Grid extends Widget_Base {
                        'premium_gallery_img_category' => 'Category 2'
                    ],
                ],
-               'fields' => array_values( $img_repeater->get_controls() ),
+               'fields' => $img_repeater->get_controls(),
                'title_field'   => '{{{ "" !== premium_gallery_img_name ? premium_gallery_img_name : "Image" }}}' . ' - {{{ "" !== premium_gallery_img_category ? premium_gallery_img_category : "No Categories" }}}',
            ]
        );
@@ -2715,7 +2714,11 @@ class Premium_Grid extends Widget_Base {
         
         $key                        = 'youtube' === $item[ 'premium_gallery_video_type' ] ? 'mute' : 'muted';
         
-        $video_params[ $key ] = $item['premium_gallery_video_mute'] ? '1' : '0';
+        $video_params[ $key ]       = $item['premium_gallery_video_mute'] ? '1' : '0';
+
+        if( 'vimeo' === $item[ 'premium_gallery_video_type' ] ) {
+            $video_params[ 'autopause' ] = '0';
+        }
 		
 		return $video_params;
     }

@@ -10,7 +10,7 @@ class Modules_Settings {
     
     protected $page_slug = 'premium-addons';
 
-    public static $pa_elements_keys = ['premium-banner', 'premium-blog', 'premium-carousel', 'premium-countdown', 'premium-counter', 'premium-dual-header', 'premium-fancytext', 'premium-image-separator', 'premium-lottie', 'premium-maps', 'premium-modalbox', 'premium-person', 'premium-progressbar', 'premium-testimonials', 'premium-title', 'premium-videobox', 'premium-pricing-table', 'premium-button', 'premium-contactform',  'premium-image-button', 'premium-grid', 'premium-vscroll', 'premium-image-scroll', 'premium-templates', 'premium-duplicator'];
+    public static $pa_elements_keys = ['premium-banner', 'premium-blog', 'premium-carousel', 'premium-countdown', 'premium-counter', 'premium-dual-header', 'premium-fancytext', 'premium-image-separator', 'premium-lottie', 'premium-maps', 'premium-modalbox', 'premium-person', 'premium-progressbar', 'premium-testimonials', 'premium-title', 'premium-videobox', 'premium-pricing-table', 'premium-button', 'premium-contactform',  'premium-image-button', 'premium-grid', 'premium-vscroll', 'premium-image-scroll', 'premium-templates', 'premium-duplicator' ];
     
     private $pa_default_settings;
     
@@ -807,6 +807,7 @@ class Modules_Settings {
             'premium-image-button'      => intval( $settings['premium-image-button'] ? 1 : 0 ),
             'premium-grid'              => intval( $settings['premium-grid'] ? 1 : 0 ),
             'premium-vscroll'           => intval( $settings['premium-vscroll'] ? 1 : 0 ),
+            // 'premium-icon-list'         => intval( $settings['premium-icon-list'] ? 1 : 0),
             'premium-image-scroll'      => intval( $settings['premium-image-scroll'] ? 1 : 0 ),
             'premium-templates'         => intval( $settings['premium-templates'] ? 1 : 0 ),
             'premium-duplicator'        => intval( $settings['premium-duplicator'] ? 1 : 0 ),

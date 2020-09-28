@@ -14,6 +14,8 @@ use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Image_Size;
 use Elementor\Group_Control_Css_Filter;
 use Elementor\Group_Control_Box_Shadow;
+use Elementor\Group_Control_Text_Shadow;
+
 
 // PremiumAddons Classes.
 use PremiumAddons\Helper_Functions;
@@ -183,6 +185,142 @@ class Premium_Image_Scroll extends Widget_Base {
                 'label_block'   => true
             ]
         );
+
+        $this->add_control(
+			'mask_image_scroll_switcher',
+			[
+				'label' => esc_html__( 'Mask Image Shape', 'premium-addons-for-elementor' ),
+				'type' => Controls_Manager::HIDDEN,
+				'separator' => 'before',
+			]
+        );
+        
+		$this->add_control(
+			'mask_shape_image_scroll',
+			[
+				'label' => esc_html__( 'Mask Image', 'premium-addons-for-elementor' ),
+				'type' => Controls_Manager::MEDIA,
+				'default' => [
+					'url' => '',
+				],
+				'description' => esc_html__( 'Use PNG image with the shape you want to mask around feature image.', 'premium-addons-for-elementor' ),
+				'selectors' => [
+					'{{WRAPPER}} .premium-image-scroll-mask-media ' => 'mask-image: url({{URL}});-webkit-mask-image: url({{URL}});',
+				],
+				'condition' => [
+					'mask_image_scroll_switcher' => 'yes',
+				],
+			]
+        );
+
+        $this->add_control(
+			'mask_shape_size_image_scroll',
+			[
+				'label' => esc_html__( 'Mask Size', 'premium-addons-for-elementor' ),
+                'type'          => Controls_Manager::SLIDER,
+				'selectors' => [
+					'{{WRAPPER}} .premium-image-scroll-mask-media ' => '-webkit-mask-size:{{SIZE}}{{UNIT}};mask-size:{{SIZE}}{{UNIT}};',
+                ],
+                'size_units'    => ['px','em','%'],
+                'default'       => [
+                    'size'	=> 100 ,
+                    'unit' => '%'
+                ],
+				'condition' => [
+					'mask_image_scroll_switcher' => 'yes',
+				],
+			]
+        );
+
+        $this->add_control('image_scroll_shadow',
+            [
+                'label'         => __('Image Shadow', 'premium-addons-for-elementor'),
+                'type'          => Controls_Manager::POPOVER_TOGGLE,
+                'condition' => [
+					'mask_image_scroll_switcher' => 'yes',
+                ],
+            ]
+        );
+                $this->add_control('image_scroll_shadow',
+            [
+                'label'         => __('Image Shadow', 'premium-addons-for-elementor'),
+                'type'          => Controls_Manager::POPOVER_TOGGLE,
+                'condition' => [
+					'mask_image_scroll_switcher' => 'yes',
+                ],
+                'return_value' => 'yes',
+				'default' => 'no',
+            ]
+        );
+        
+        $this->start_popover();
+
+        $this->add_control('image_scroll_shadow_color',
+            [
+                'label'         => __('Color', 'premium-addons-for-elementor'),
+                'type'          => Controls_Manager::COLOR,
+                'default'       => 'rgba(0,0,0,0.75)'
+            ]
+        );
+        
+        $this->add_control('image_scroll_shadow_blur',
+			[
+				'label'			=> __( 'Blur', 'premium-addons-for-elementor' ),
+				'type'			=> Controls_Manager::SLIDER,
+                'range'         => [
+                    'px'    => [
+                        'min'   => 0,
+                        'max'   => 100,
+                        'step'  => 1
+                    ]
+                ],
+                'default'       => [
+                    'size'	=> 1 ,
+                    'unit' => 'px'
+                ],
+			]
+        );
+        
+        $this->add_control('image_scroll_shadow_h',
+            [
+                'label'			=> __( 'Horizontal', 'premium-addons-for-elementor' ),
+                'type'			=> Controls_Manager::SLIDER,
+                'range'         => [
+                    'px'    => [
+                        'min'   => 0,
+                        'max'   => 100,
+                        'step'  => 1
+                    ]
+                ],
+                'default'       => [
+                    'size'	=> 4 ,
+                    'unit' => 'px'
+                ],
+            ]
+        );
+
+        $this->add_control('image_scroll_shadow_v',
+            [
+                'label'			=> __( 'Vertical', 'premium-addons-for-elementor' ),
+                'type'			=> Controls_Manager::SLIDER,
+                'range'         => [
+                    'px'    => [
+                        'min'   => 0,
+                        'max'   => 100,
+                        'step'  => 1
+                    ]
+                ],
+                'default'       => [
+                    'size'	=> 4 ,
+                    'unit' => 'px'
+                ],
+            ]
+        );
+
+        $this->end_popover();
+        
+
+        
 
         $this->end_controls_section();
 
@@ -408,7 +546,7 @@ class Premium_Image_Scroll extends Widget_Base {
 					'{{WRAPPER}} .premium-image-scroll-container img' => 'mix-blend-mode: {{VALUE}}',
 				],
 			]
-		);
+        );
         
         $this->end_controls_section();
 
@@ -541,7 +679,7 @@ class Premium_Image_Scroll extends Widget_Base {
         $image_scroll = [
             'trigger'     => $settings['trigger_type'] ,
             'direction'   => $settings['direction_type'],
-            'reverse'     => $settings['reverse']
+            'reverse'     => $settings['reverse'],
         ];
 
         $this->add_render_attribute( 'container', 'class', 'premium-image-scroll-container' );
@@ -549,7 +687,11 @@ class Premium_Image_Scroll extends Widget_Base {
         $this->add_render_attribute( 'container', 'data-settings', wp_json_encode( $image_scroll ) );
         
         $this->add_render_attribute( 'direction_type', 'class', 'premium-image-scroll-' . $settings['direction_type'] );
-       
+        
+        if(!empty($settings["mask_image_scroll_switcher"]) && $settings["mask_image_scroll_switcher"]==='yes'){
+            $this->add_render_attribute( 'direction_type', 'class', 'premium-image-scroll-mask-media' );
+        }
+
         $image_html = '';
         if ( ! empty( $settings['image']['url'] ) ) {
             
@@ -561,10 +703,13 @@ class Premium_Image_Scroll extends Widget_Base {
 
 			$image_html = Group_Control_Image_Size::get_attachment_image_html( $settings, 'thumbnail', 'image' );
             
-		}
+        }
+        if($settings['mask_image_scroll_switcher'] === 'yes' && $settings['mask_shape_image_scroll']['url'] !== ''){
+            $this->add_render_attribute( 'shadow', 'style', 'filter: drop-shadow('.$settings['image_scroll_shadow_color'] .' '. $settings['image_scroll_shadow_h']['size'] .'px '. $settings['image_scroll_shadow_v']['size'] .'px '. $settings['image_scroll_shadow_blur']['size'].'px '.')' );
+        }
 
         ?>
-            <div class="premium-image-scroll-section">
+            <div class="premium-image-scroll-section" <?php echo $this->get_render_attribute_string('shadow'); ?>>
                 <div <?php echo $this->get_render_attribute_string('container'); ?>>
                     <?php if( 'yes' == $settings['icon_switcher'] ) : ?>
                         <div class="premium-image-scroll-content">
@@ -638,7 +783,11 @@ class Premium_Image_Scroll extends Widget_Base {
             view.addRenderAttribute( 'direction_type', 'class', 'premium-image-scroll-' + direction );
 
             view.addRenderAttribute( 'image', 'src', settings.image.url );
-            
+
+            if(settings.mask_image_scroll_switcher && settings.mask_image_scroll_switcher ==='yes'){
+                view.addRenderAttribute( 'direction_type', 'class', 'premium-image-scroll-mask-media');
+            }
+         
             var imageHtml = '';
             if ( settings.image.url ) {
 			var image = {
@@ -654,10 +803,12 @@ class Premium_Image_Scroll extends Widget_Base {
 			imageHtml = '<img src="' + image_url + '"/>';
             
 		}
+        if(settings.mask_image_scroll_switcher === 'yes' && settings.mask_shape_image_scroll.url !== ''){
+            view.addRenderAttribute( 'shadow', 'style', 'filter: drop-shadow('+settings.image_scroll_shadow_color +' '+ settings.image_scroll_shadow_h.size +'px '+ settings.image_scroll_shadow_v.size +'px '+ settings.image_scroll_shadow_blur.size+'px '+')' );
+        }
 
         #>
-        
-        <div class="premium-image-scroll-section">
+        <div class="premium-image-scroll-section" {{{ view.getRenderAttributeString('shadow') }}}>
             <div {{{ view.getRenderAttributeString('container') }}}>
                 <# if (  'yes' == settings.icon_switcher ) { #>
                     <div class="premium-image-scroll-content">   
@@ -680,7 +831,6 @@ class Premium_Image_Scroll extends Widget_Base {
                 </div>
             </div>
         </div>
-        
     <?php 
     }
     

@@ -18,6 +18,14 @@ jQuery(document).ready( function($) {
             matchBrackets: true,
             autoCloseBrackets: true,
             extraKeys: {
+                "F11": function(cm) {
+                    cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+                    fullscreen_buttons( true );
+                },
+                "Esc": function(cm) {
+                    if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+                    fullscreen_buttons( false );
+                },
                 "Ctrl-Space": "autocomplete",
                 "Cmd-Space": "autocomplete",
                 "Ctrl-F": "findPersistent",
@@ -50,6 +58,13 @@ jQuery(document).ready( function($) {
             editor.setSize(cm_width, cm_height);
         });
 
+        // Code Beautifier
+        $("#ccj-beautifier").click(function(e){
+            CodeMirror.commands["selectAll"](editor);
+            editor.autoFormatRange(editor.getCursor(true), editor.getCursor(false));
+            editor.setCursor(0);
+            e.preventDefault();
+        });
 
 		// Autocomplete
 		if ( CCJ.autocomplete === '1' ) {
@@ -81,6 +96,51 @@ jQuery(document).ready( function($) {
             editor.setCursor(parseFloat(curPos[1]), parseFloat(curPos[2]));
         }
 
+    }
+
+    // Action for the `fullscreen` button
+    $("#ccj-fullscreen-button").click( function() {
+        var toggle = editor.getOption("fullScreen");
+        editor.setOption("fullScreen", !toggle);
+        fullscreen_buttons( !toggle );
+    });
+
+    $("#publish").click(function(e){
+        if ( editor.getOption("fullScreen") === true ) {
+            Cookies.set('fullScreen', 'true');
+        }
+    });
+
+    // Show fullscreen
+    if ( Cookies.get('fullScreen') == 'true' ) {
+        var toggle = editor.getOption("fullScreen");
+        editor.setOption("fullScreen", !toggle);
+        fullscreen_buttons( !toggle );
+        Cookies.remove('fullScreen');
+    }
+
+    // Enable the tipsy 
+    $('span[rel=tipsy].tipsy-no-html').tipsy({fade: true, gravity: 's'});
+    $('span[rel=tipsy]').tipsy({fade: true, gravity: 's', html: true});
+
+    // Toggle the buttons when in fullscreen mode
+    function fullscreen_buttons( mode ) {
+        editor.focus();
+        if ( mode === true ) {
+            $("#publish").css({
+                'position'  : 'fixed',
+                'right'     : '40px',
+                'bottom'    : '40px',
+                'z-index'   : 100005,
+            });
+        } else {
+            $("#publish").css({
+                'position'  : 'static',
+                'right'     : 'initial',
+                'bottom'    : 'initial',
+                'z-index'   : 10,
+            });
+        }
     }
 
 
@@ -207,6 +267,13 @@ jQuery(document).ready( function($) {
 		// Save current content to revert to when cancelling.
 		$el = $( '#editable-post-name' );
 		revert_e = $el.html();
+
+		if ( typeof postL10n === 'undefined' ) {
+			postL10n = {
+				ok     : wp.i18n.__( 'OK' ),
+				cancel : wp.i18n.__( 'Cancel' ),
+			}
+		}
 
         buttons.html( '<button type="button" class="save button button-small">' + postL10n.ok + '</button> <button type="button" class="cancel button- link">' + postL10n.cancel + '</button>' );
 

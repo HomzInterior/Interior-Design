@@ -1,1045 +1,1057 @@
 (function ($) {
 
-	'use strict';
-
-	var PremiumTempsData = window.PremiumTempsData || {},
-		PremiumEditor,
-		PremiumEditorViews,
-		PremiumControlsViews,
-		PremiumModules;
-
-	PremiumEditorViews = {
-
-		ModalLayoutView: null,
-		ModalHeaderView: null,
-		ModalHeaderInsertButton: null,
-		ModalLoadingView: null,
-		ModalBodyView: null,
-		ModalErrorView: null,
-		LibraryCollection: null,
-		KeywordsModel: null,
-		ModalCollectionView: null,
-		ModalTabsCollection: null,
-		ModalTabsCollectionView: null,
-		FiltersCollectionView: null,
-		FiltersItemView: null,
-		ModalTabsItemView: null,
-		ModalTemplateItemView: null,
-		ModalInsertTemplateBehavior: null,
-		ModalTemplateModel: null,
-		CategoriesCollection: null,
-		ModalPreviewView: null,
-		ModalHeaderBack: null,
-		ModalHeaderLogo: null,
-		KeywordsView: null,
-		TabModel: null,
-		CategoryModel: null,
-
-		init: function () {
-			var self = this;
-
-			self.ModalTemplateModel = Backbone.Model.extend({
-				defaults: {
-					template_id: 0,
-					name: '',
-					title: '',
-					thumbnail: '',
-					preview: '',
-					source: '',
-					categories: [],
-					keywords: []
-				}
-			});
-
-			self.ModalHeaderView = Marionette.LayoutView.extend({
-
-				id: 'premium-template-modal-header',
-				template: '#tmpl-premium-template-modal-header',
-
-				ui: {
-					closeModal: '#premium-template-modal-header-close-modal'
-				},
-
-				events: {
-					'click @ui.closeModal': 'onCloseModalClick'
-				},
-
-				regions: {
-					headerLogo: '#premium-template-modal-header-logo-area',
-					headerTabs: '#premium-template-modal-header-tabs',
-					headerActions: '#premium-template-modal-header-actions'
-				},
-
-				onCloseModalClick: function () {
-					PremiumEditor.closeModal();
-				}
-
-			});
-
-			self.TabModel = Backbone.Model.extend({
-				defaults: {
-					slug: '',
-					title: ''
-				}
-			});
-
-			self.LibraryCollection = Backbone.Collection.extend({
-				model: self.ModalTemplateModel
-			});
-
-			self.ModalTabsCollection = Backbone.Collection.extend({
-				model: self.TabModel
-			});
-
-			self.CategoryModel = Backbone.Model.extend({
-				defaults: {
-					slug: '',
-					title: ''
-				}
-			});
-
-			self.KeywordsModel = Backbone.Model.extend({
-				defaults: {
-					keywords: {}
-				}
-			});
+    'use strict';
+
+    var PremiumTempsData = window.PremiumTempsData || {},
+        PremiumEditor,
+        PremiumEditorViews,
+        PremiumControlsViews,
+        PremiumModules;
+
+    PremiumEditorViews = {
+
+        ModalLayoutView: null,
+        ModalHeaderView: null,
+        ModalHeaderInsertButton: null,
+        ModalLoadingView: null,
+        ModalBodyView: null,
+        ModalErrorView: null,
+        LibraryCollection: null,
+        KeywordsModel: null,
+        ModalCollectionView: null,
+        ModalTabsCollection: null,
+        ModalTabsCollectionView: null,
+        FiltersCollectionView: null,
+        FiltersItemView: null,
+        ModalTabsItemView: null,
+        ModalTemplateItemView: null,
+        ModalInsertTemplateBehavior: null,
+        ModalTemplateModel: null,
+        CategoriesCollection: null,
+        ModalPreviewView: null,
+        ModalHeaderBack: null,
+        ModalHeaderLogo: null,
+        KeywordsView: null,
+        TabModel: null,
+        CategoryModel: null,
+
+        init: function () {
+            var self = this;
+
+            self.ModalTemplateModel = Backbone.Model.extend({
+                defaults: {
+                    template_id: 0,
+                    name: '',
+                    title: '',
+                    thumbnail: '',
+                    preview: '',
+                    source: '',
+                    categories: [],
+                    keywords: []
+                }
+            });
+
+            self.ModalHeaderView = Marionette.LayoutView.extend({
+
+                id: 'premium-template-modal-header',
+                template: '#tmpl-premium-template-modal-header',
+
+                ui: {
+                    closeModal: '#premium-template-modal-header-close-modal'
+                },
+
+                events: {
+                    'click @ui.closeModal': 'onCloseModalClick'
+                },
+
+                regions: {
+                    headerLogo: '#premium-template-modal-header-logo-area',
+                    headerTabs: '#premium-template-modal-header-tabs',
+                    headerActions: '#premium-template-modal-header-actions'
+                },
+
+                onCloseModalClick: function () {
+                    PremiumEditor.closeModal();
+                }
+
+            });
+
+            self.TabModel = Backbone.Model.extend({
+                defaults: {
+                    slug: '',
+                    title: ''
+                }
+            });
+
+            self.LibraryCollection = Backbone.Collection.extend({
+                model: self.ModalTemplateModel
+            });
+
+            self.ModalTabsCollection = Backbone.Collection.extend({
+                model: self.TabModel
+            });
+
+            self.CategoryModel = Backbone.Model.extend({
+                defaults: {
+                    slug: '',
+                    title: ''
+                }
+            });
+
+            self.KeywordsModel = Backbone.Model.extend({
+                defaults: {
+                    keywords: {}
+                }
+            });
 
-			self.CategoriesCollection = Backbone.Collection.extend({
-				model: self.CategoryModel
-			});
+            self.CategoriesCollection = Backbone.Collection.extend({
+                model: self.CategoryModel
+            });
 
-			self.KeywordsView = Marionette.ItemView.extend({
-				id: 'elementor-template-library-filter',
-				template: '#tmpl-premium-template-modal-keywords',
-				ui: {
-					keywords: '.premium-library-keywords'
-				},
+            self.KeywordsView = Marionette.ItemView.extend({
+                id: 'elementor-template-library-filter',
+                template: '#tmpl-premium-template-modal-keywords',
+                ui: {
+                    keywords: '.premium-library-keywords'
+                },
 
-				events: {
-					'change @ui.keywords': 'onSelectKeyword'
-				},
+                events: {
+                    'change @ui.keywords': 'onSelectKeyword'
+                },
 
-				onSelectKeyword: function (event) {
-					var selected = event.currentTarget.selectedOptions[0].value;
-					PremiumEditor.setFilter('keyword', selected);
-				},
+                onSelectKeyword: function (event) {
+                    var selected = event.currentTarget.selectedOptions[0].value;
+                    PremiumEditor.setFilter('keyword', selected);
+                },
 
-				onRender: function () {
-					var $filters = this.$('.premium-library-keywords');
-					$filters.select2({
-						placeholder: 'Choose Widget',
-						allowClear: true,
-						width: 250
-					});
-				}
-			});
+                onRender: function () {
+                    var $filters = this.$('.premium-library-keywords');
+                    $filters.select2({
+                        placeholder: 'Choose Widget',
+                        allowClear: true,
+                        width: 250
+                    });
+                }
+            });
 
-			self.ModalPreviewView = Marionette.ItemView.extend({
+            self.ModalPreviewView = Marionette.ItemView.extend({
 
-				template: '#tmpl-premium-template-modal-preview',
+                template: '#tmpl-premium-template-modal-preview',
 
-				id: 'premium-templatate-item-preview-wrap',
+                id: 'premium-templatate-item-preview-wrap',
 
-				ui: {
-					iframe: 'iframe',
-					notice: '.premium-template-item-notice'
-				},
+                ui: {
+                    iframe: 'iframe',
+                    notice: '.premium-template-item-notice'
+                },
 
 
-				onRender: function () {
+                onRender: function () {
 
-					if (null !== this.getOption('notice')) {
-						if (this.getOption('notice').length) {
-							var message = "";
-							if (-1 !== this.getOption('notice').indexOf("facebook")) {
-								message += "<p>Please login with your Facebook account in order to get your Facebook Reviews.</p>";
-							} else if (-1 !== this.getOption('notice').indexOf("google")) {
-								message += "<p>You need to add your Google API key from Dashboard -> Premium Add-ons for Elementor -> Google Maps</p>";
-							} else if (-1 !== this.getOption('notice').indexOf("form")) {
-								message += "<p>You need to have <a href='https://wordpress.org/plugins/contact-form-7/' target='_blank'>Contact Form 7 plugin</a> installed and active.</p>";
-							}
-
-							this.ui.notice.html('<div><p><strong>Important!</strong></p>' + message + '</div>');
-						}
-					}
-
-					this.ui.iframe.attr('src', this.getOption('url'));
+                    if (null !== this.getOption('notice')) {
+                        if (this.getOption('notice').length) {
+                            var message = "";
+                            if (-1 !== this.getOption('notice').indexOf("facebook")) {
+                                message += "<p>Please login with your Facebook account in order to get your Facebook Reviews.</p>";
+                            } else if (-1 !== this.getOption('notice').indexOf("google")) {
+                                message += "<p>You need to add your Google API key from Dashboard -> Premium Add-ons for Elementor -> Google Maps</p>";
+                            } else if (-1 !== this.getOption('notice').indexOf("form")) {
+                                message += "<p>You need to have <a href='https://wordpress.org/plugins/contact-form-7/' target='_blank'>Contact Form 7 plugin</a> installed and active.</p>";
+                            }
 
-				}
-			});
+                            this.ui.notice.html('<div><p><strong>Important!</strong></p>' + message + '</div>');
+                        }
+                    }
+
+                    this.ui.iframe.attr('src', this.getOption('url'));
 
-			self.ModalHeaderBack = Marionette.ItemView.extend({
+                }
+            });
 
-				template: '#tmpl-premium-template-modal-header-back',
+            self.ModalHeaderBack = Marionette.ItemView.extend({
 
-				id: 'premium-template-modal-header-back',
+                template: '#tmpl-premium-template-modal-header-back',
 
-				ui: {
-					button: 'button'
-				},
+                id: 'premium-template-modal-header-back',
 
-				events: {
-					'click @ui.button': 'onBackClick',
-				},
+                ui: {
+                    button: 'button'
+                },
 
-				onBackClick: function () {
-					PremiumEditor.setPreview('back');
-				}
+                events: {
+                    'click @ui.button': 'onBackClick',
+                },
 
-			});
+                onBackClick: function () {
+                    PremiumEditor.setPreview('back');
+                }
 
-			self.ModalHeaderLogo = Marionette.ItemView.extend({
-
-				template: '#tmpl-premium-template-modal-header-logo',
-
-				id: 'premium-template-modal-header-logo'
-
-			});
+            });
 
-			self.ModalBodyView = Marionette.LayoutView.extend({
+            self.ModalHeaderLogo = Marionette.ItemView.extend({
 
-				id: 'premium-template-library-content',
+                template: '#tmpl-premium-template-modal-header-logo',
 
-				className: function () {
-					return 'library-tab-' + PremiumEditor.getTab();
-				},
+                id: 'premium-template-modal-header-logo'
+
+            });
+
+            self.ModalBodyView = Marionette.LayoutView.extend({
+
+                id: 'premium-template-library-content',
 
-				template: '#tmpl-premium-template-modal-content',
+                className: function () {
+                    return 'library-tab-' + PremiumEditor.getTab();
+                },
 
-				regions: {
-					contentTemplates: '.premium-templates-list',
-					contentFilters: '.premium-filters-list',
-					contentKeywords: '.premium-keywords-list'
-				}
+                template: '#tmpl-premium-template-modal-content',
 
-			});
+                regions: {
+                    contentTemplates: '.premium-templates-list',
+                    contentFilters: '.premium-filters-list',
+                    contentKeywords: '.premium-keywords-list'
+                }
 
-			self.ModalInsertTemplateBehavior = Marionette.Behavior.extend({
-				ui: {
-					insertButton: '.premium-template-insert'
-				},
+            });
 
-				events: {
-					'click @ui.insertButton': 'onInsertButtonClick'
-				},
+            self.ModalInsertTemplateBehavior = Marionette.Behavior.extend({
+                ui: {
+                    insertButton: '.premium-template-insert'
+                },
 
-				onInsertButtonClick: function () {
+                events: {
+                    'click @ui.insertButton': 'onInsertButtonClick'
+                },
 
-					var templateModel = this.view.model,
-						innerTemplates = templateModel.attributes.dependencies,
-						isPro = templateModel.attributes.pro,
-						innerTemplatesLength = Object.keys(innerTemplates).length,
-						options = {};
+                onInsertButtonClick: function () {
 
-					PremiumEditor.layout.showLoadingView();
-					if (innerTemplatesLength > 0) {
-						for (var key in innerTemplates) {
-							$.ajax({
-								url: ajaxurl,
-								type: 'post',
-								dataType: 'json',
-								data: {
-									action: 'premium_inner_template',
-									template: innerTemplates[key],
-									tab: PremiumEditor.getTab()
-								}
-							});
-						}
-					}
+                    var templateModel = this.view.model,
+                        innerTemplates = templateModel.attributes.dependencies,
+                        isPro = templateModel.attributes.pro,
+                        innerTemplatesLength = Object.keys(innerTemplates).length,
+                        options = {};
 
-					if ("valid" === PremiumTempsData.license.status || !isPro) {
+                    PremiumEditor.layout.showLoadingView();
+                    if (innerTemplatesLength > 0) {
+                        for (var key in innerTemplates) {
+                            $.ajax({
+                                url: ajaxurl,
+                                type: 'post',
+                                dataType: 'json',
+                                data: {
+                                    action: 'premium_inner_template',
+                                    template: innerTemplates[key],
+                                    tab: PremiumEditor.getTab()
+                                }
+                            });
+                        }
+                    }
 
-						elementor.templates.requestTemplateContent(
-							templateModel.get('source'),
-							templateModel.get('template_id'),
-							{
-								data: {
-									tab: PremiumEditor.getTab(),
-									page_settings: false
-								},
-								success: function (data) {
+                    if ("valid" === PremiumTempsData.license.status || !isPro) {
 
-									if (!data.license) {
-										PremiumEditor.layout.showLicenseError();
-										return;
-									}
+                        elementor.templates.requestTemplateContent(
+                            templateModel.get('source'),
+                            templateModel.get('template_id'), {
+                            data: {
+                                tab: PremiumEditor.getTab(),
+                                page_settings: false
+                            },
+                            success: function (data) {
 
-									console.log("%c Template Inserted Successfully!!", "color: #7a7a7a; background-color: #eee;");
+                                if (!data.license) {
+                                    PremiumEditor.layout.showLicenseError();
+                                    return;
+                                }
 
-									PremiumEditor.closeModal();
+                                console.log("%c Template Inserted Successfully!!", "color: #7a7a7a; background-color: #eee;");
 
-									elementor.channels.data.trigger('template:before:insert', templateModel);
+                                PremiumEditor.closeModal();
 
-									if (null !== PremiumEditor.atIndex) {
-										options.at = PremiumEditor.atIndex;
-									}
+                                elementor.channels.data.trigger('template:before:insert', templateModel);
 
-									elementor.sections.currentView.addChildModel(data.content, options);
+                                if (null !== PremiumEditor.atIndex) {
+                                    options.at = PremiumEditor.atIndex;
+                                }
 
-									elementor.channels.data.trigger('template:after:insert', templateModel);
-									jQuery("#elementor-panel-saver-button-save-options, #elementor-panel-saver-button-publish").removeClass("elementor-disabled");
-									PremiumEditor.atIndex = null;
+                                if (-1 !== PremiumTempsData.Elementor_Version.indexOf('3.0.')) {
+                                    elementor.previewView.addChildModel(data.content, options);
+                                } else {
+                                    elementor.sections.currentView.addChildModel(data.content, options);
+                                }
 
-								},
-								error: function (err) {
-									console.log(err);
-								}
-							}
-						);
-					} else {
-						PremiumEditor.layout.showLicenseError();
-					}
-				}
-			});
 
-			self.ModalHeaderInsertButton = Marionette.ItemView.extend({
+                                elementor.channels.data.trigger('template:after:insert', templateModel);
+                                jQuery("#elementor-panel-saver-button-save-options, #elementor-panel-saver-button-publish").removeClass("elementor-disabled");
+                                PremiumEditor.atIndex = null;
 
-				template: '#tmpl-premium-template-modal-insert-button',
+                            },
+                            error: function (err) {
+                                console.log(err);
+                            }
+                        }
+                        );
+                    } else {
+                        PremiumEditor.layout.showLicenseError();
+                    }
+                }
+            });
 
-				id: 'premium-template-modal-insert-button',
+            self.ModalHeaderInsertButton = Marionette.ItemView.extend({
 
-				behaviors: {
-					insertTemplate: {
-						behaviorClass: self.ModalInsertTemplateBehavior
-					}
-				}
+                template: '#tmpl-premium-template-modal-insert-button',
 
-			});
+                id: 'premium-template-modal-insert-button',
 
-			self.FiltersItemView = Marionette.ItemView.extend({
+                behaviors: {
+                    insertTemplate: {
+                        behaviorClass: self.ModalInsertTemplateBehavior
+                    }
+                }
 
-				template: '#tmpl-premium-template-modal-filters-item',
+            });
 
-				className: function () {
-					return 'premium-template-filter-item';
-				},
+            self.FiltersItemView = Marionette.ItemView.extend({
 
-				ui: function () {
-					return {
-						filterLabels: '.premium-template-filter-label'
-					};
-				},
+                template: '#tmpl-premium-template-modal-filters-item',
 
-				events: function () {
-					return {
-						'click @ui.filterLabels': 'onFilterClick'
-					};
-				},
+                className: function () {
+                    return 'premium-template-filter-item';
+                },
 
-				onFilterClick: function (event) {
+                ui: function () {
+                    return {
+                        filterLabels: '.premium-template-filter-label'
+                    };
+                },
 
-					var $clickedInput = jQuery(event.target);
-					jQuery('.premium-library-keywords').val('');
-					PremiumEditor.setFilter('category', $clickedInput.val());
-					PremiumEditor.setFilter('keyword', '');
-				}
+                events: function () {
+                    return {
+                        'click @ui.filterLabels': 'onFilterClick'
+                    };
+                },
 
-			});
+                onFilterClick: function (event) {
 
-			self.ModalTabsItemView = Marionette.ItemView.extend({
+                    var $clickedInput = jQuery(event.target);
+                    jQuery('.premium-library-keywords').val('');
+                    PremiumEditor.setFilter('category', $clickedInput.val());
+                    PremiumEditor.setFilter('keyword', '');
+                }
 
-				template: '#tmpl-premium-template-modal-tabs-item',
+            });
 
-				className: function () {
-					return 'elementor-template-library-menu-item';
-				},
+            self.ModalTabsItemView = Marionette.ItemView.extend({
 
-				ui: function () {
-					return {
-						tabsLabels: 'label',
-						tabsInput: 'input'
-					};
-				},
+                template: '#tmpl-premium-template-modal-tabs-item',
 
-				events: function () {
-					return {
-						'click @ui.tabsLabels': 'onTabClick'
-					};
-				},
+                className: function () {
+                    return 'elementor-template-library-menu-item';
+                },
 
-				onRender: function () {
-					if (this.model.get('slug') === PremiumEditor.getTab()) {
-						this.ui.tabsInput.attr('checked', 'checked');
-					}
-				},
+                ui: function () {
+                    return {
+                        tabsLabels: 'label',
+                        tabsInput: 'input'
+                    };
+                },
 
-				onTabClick: function (event) {
+                events: function () {
+                    return {
+                        'click @ui.tabsLabels': 'onTabClick'
+                    };
+                },
 
-					var $clickedInput = jQuery(event.target);
-					PremiumEditor.setTab($clickedInput.val());
-					PremiumEditor.setFilter('keyword', '');
-				}
+                onRender: function () {
+                    if (this.model.get('slug') === PremiumEditor.getTab()) {
+                        this.ui.tabsInput.attr('checked', 'checked');
+                    }
+                },
 
-			});
+                onTabClick: function (event) {
 
-			self.FiltersCollectionView = Marionette.CompositeView.extend({
+                    var $clickedInput = jQuery(event.target);
+                    PremiumEditor.setTab($clickedInput.val());
+                    PremiumEditor.setFilter('keyword', '');
+                }
 
-				id: 'premium-template-library-filters',
+            });
 
-				template: '#tmpl-premium-template-modal-filters',
+            self.FiltersCollectionView = Marionette.CompositeView.extend({
 
-				childViewContainer: '#premium-modal-filters-container',
+                id: 'premium-template-library-filters',
 
-				getChildView: function (childModel) {
-					return self.FiltersItemView;
-				}
+                template: '#tmpl-premium-template-modal-filters',
 
-			});
+                childViewContainer: '#premium-modal-filters-container',
 
-			self.ModalTabsCollectionView = Marionette.CompositeView.extend({
+                getChildView: function (childModel) {
+                    return self.FiltersItemView;
+                }
 
-				template: '#tmpl-premium-template-modal-tabs',
+            });
 
-				childViewContainer: '#premium-modal-tabs-items',
+            self.ModalTabsCollectionView = Marionette.CompositeView.extend({
 
-				initialize: function () {
-					this.listenTo(PremiumEditor.channels.layout, 'tamplate:cloned', this._renderChildren);
-				},
+                template: '#tmpl-premium-template-modal-tabs',
 
-				getChildView: function (childModel) {
-					return self.ModalTabsItemView;
-				}
+                childViewContainer: '#premium-modal-tabs-items',
 
-			});
+                initialize: function () {
+                    this.listenTo(PremiumEditor.channels.layout, 'tamplate:cloned', this._renderChildren);
+                },
 
-			self.ModalTemplateItemView = Marionette.ItemView.extend({
+                getChildView: function (childModel) {
+                    return self.ModalTabsItemView;
+                }
 
-				template: '#tmpl-premium-template-modal-item',
+            });
 
-				className: function () {
+            self.ModalTemplateItemView = Marionette.ItemView.extend({
 
-					var urlClass = ' premium-template-has-url',
-						sourceClass = ' elementor-template-library-template-',
-						proTemplate = '';
+                template: '#tmpl-premium-template-modal-item',
 
-					if ('' === this.model.get('preview')) {
-						urlClass = ' premium-template-no-url';
-					}
+                className: function () {
 
-					sourceClass += 'remote';
+                    var urlClass = ' premium-template-has-url',
+                        sourceClass = ' elementor-template-library-template-',
+                        proTemplate = '';
 
-					if (this.model.get('pro')) {
-						proTemplate = ' premium-template-pro';
-					}
+                    if ('' === this.model.get('preview')) {
+                        urlClass = ' premium-template-no-url';
+                    }
 
-					return 'elementor-template-library-template' + sourceClass + urlClass + proTemplate;
-				},
+                    sourceClass += 'remote';
 
-				ui: function () {
-					return {
-						previewButton: '.elementor-template-library-template-preview',
-					};
-				},
+                    if (this.model.get('pro')) {
+                        proTemplate = ' premium-template-pro';
+                    }
 
-				events: function () {
-					return {
-						'click @ui.previewButton': 'onPreviewButtonClick',
-					};
-				},
+                    return 'elementor-template-library-template' + sourceClass + urlClass + proTemplate;
+                },
 
-				onPreviewButtonClick: function () {
+                ui: function () {
+                    return {
+                        previewButton: '.elementor-template-library-template-preview',
+                    };
+                },
 
-					if ('' === this.model.get('url')) {
-						return;
-					}
+                events: function () {
+                    return {
+                        'click @ui.previewButton': 'onPreviewButtonClick',
+                    };
+                },
 
-					PremiumEditor.setPreview(this.model);
-				},
+                onPreviewButtonClick: function () {
 
-				behaviors: {
-					insertTemplate: {
-						behaviorClass: self.ModalInsertTemplateBehavior
-					}
-				}
-			});
+                    if ('' === this.model.get('url')) {
+                        return;
+                    }
 
-			self.ModalCollectionView = Marionette.CompositeView.extend({
+                    PremiumEditor.setPreview(this.model);
+                },
 
-				template: '#tmpl-premium-template-modal-templates',
+                behaviors: {
+                    insertTemplate: {
+                        behaviorClass: self.ModalInsertTemplateBehavior
+                    }
+                }
+            });
 
-				id: 'premium-template-library-templates',
+            self.ModalCollectionView = Marionette.CompositeView.extend({
 
-				childViewContainer: '#premium-modal-templates-container',
+                template: '#tmpl-premium-template-modal-templates',
 
-				initialize: function () {
+                id: 'premium-template-library-templates',
 
-					this.listenTo(PremiumEditor.channels.templates, 'filter:change', this._renderChildren);
-				},
+                childViewContainer: '#premium-modal-templates-container',
 
-				filter: function (childModel) {
+                initialize: function () {
 
-					var filter = PremiumEditor.getFilter('category'),
-						keyword = PremiumEditor.getFilter('keyword');
+                    this.listenTo(PremiumEditor.channels.templates, 'filter:change', this._renderChildren);
+                },
 
-					if (!filter && !keyword) {
-						return true;
-					}
+                filter: function (childModel) {
 
-					if (keyword && !filter) {
-						return _.contains(childModel.get('keywords'), keyword);
-					}
+                    var filter = PremiumEditor.getFilter('category'),
+                        keyword = PremiumEditor.getFilter('keyword');
 
-					if (filter && !keyword) {
-						return _.contains(childModel.get('categories'), filter);
-					}
+                    if (!filter && !keyword) {
+                        return true;
+                    }
 
-					return _.contains(childModel.get('categories'), filter) && _.contains(childModel.get('keywords'), keyword);
+                    if (keyword && !filter) {
+                        return _.contains(childModel.get('keywords'), keyword);
+                    }
 
-				},
+                    if (filter && !keyword) {
+                        return _.contains(childModel.get('categories'), filter);
+                    }
 
-				getChildView: function (childModel) {
-					return self.ModalTemplateItemView;
-				},
+                    return _.contains(childModel.get('categories'), filter) && _.contains(childModel.get('keywords'), keyword);
 
-				onRenderCollection: function () {
+                },
 
-					var container = this.$childViewContainer,
-						items = this.$childViewContainer.children(),
-						tab = PremiumEditor.getTab();
+                getChildView: function (childModel) {
+                    return self.ModalTemplateItemView;
+                },
 
-					if ('premium_page' === tab || 'local' === tab) {
-						return;
-					}
+                onRenderCollection: function () {
 
-					// Wait for thumbnails to be loaded
-					container.imagesLoaded(function () { }).done(function () {
-						self.masonry.init({
-							container: container,
-							items: items
-						});
-					});
-				}
+                    var container = this.$childViewContainer,
+                        items = this.$childViewContainer.children(),
+                        tab = PremiumEditor.getTab();
 
-			});
+                    if ('premium_page' === tab || 'local' === tab) {
+                        return;
+                    }
 
-			self.ModalLayoutView = Marionette.LayoutView.extend({
+                    // Wait for thumbnails to be loaded
+                    container.imagesLoaded(function () { }).done(function () {
+                        self.masonry.init({
+                            container: container,
+                            items: items
+                        });
+                    });
+                }
 
-				el: '#premium-template-modal',
+            });
 
-				regions: PremiumTempsData.modalRegions,
+            self.ModalLayoutView = Marionette.LayoutView.extend({
 
-				initialize: function () {
+                el: '#premium-template-modal',
 
-					this.getRegion('modalHeader').show(new self.ModalHeaderView());
-					this.listenTo(PremiumEditor.channels.tabs, 'filter:change', this.switchTabs);
-					this.listenTo(PremiumEditor.channels.layout, 'preview:change', this.switchPreview);
+                regions: PremiumTempsData.modalRegions,
 
-				},
+                initialize: function () {
 
-				switchTabs: function () {
-					this.showLoadingView();
-					PremiumEditor.setFilter('keyword', '');
-					PremiumEditor.requestTemplates(PremiumEditor.getTab());
-				},
+                    this.getRegion('modalHeader').show(new self.ModalHeaderView());
+                    this.listenTo(PremiumEditor.channels.tabs, 'filter:change', this.switchTabs);
+                    this.listenTo(PremiumEditor.channels.layout, 'preview:change', this.switchPreview);
 
-				switchPreview: function () {
+                },
 
-					var header = this.getHeaderView(),
-						preview = PremiumEditor.getPreview();
+                switchTabs: function () {
+                    this.showLoadingView();
+                    PremiumEditor.setFilter('keyword', '');
+                    PremiumEditor.requestTemplates(PremiumEditor.getTab());
+                },
 
-					var filter = PremiumEditor.getFilter('category'),
-						keyword = PremiumEditor.getFilter('keyword');
+                switchPreview: function () {
 
-					if ('back' === preview) {
-						header.headerLogo.show(new self.ModalHeaderLogo());
-						header.headerTabs.show(new self.ModalTabsCollectionView({
-							collection: PremiumEditor.collections.tabs
-						}));
+                    var header = this.getHeaderView(),
+                        preview = PremiumEditor.getPreview();
 
-						header.headerActions.empty();
-						PremiumEditor.setTab(PremiumEditor.getTab());
+                    var filter = PremiumEditor.getFilter('category'),
+                        keyword = PremiumEditor.getFilter('keyword');
 
-						if ('' != filter) {
-							PremiumEditor.setFilter('category', filter);
-							jQuery('#premium-modal-filters-container').find("input[value='" + filter + "']").prop('checked', true);
+                    if ('back' === preview) {
+                        header.headerLogo.show(new self.ModalHeaderLogo());
+                        header.headerTabs.show(new self.ModalTabsCollectionView({
+                            collection: PremiumEditor.collections.tabs
+                        }));
 
-						}
+                        header.headerActions.empty();
+                        PremiumEditor.setTab(PremiumEditor.getTab());
 
-						if ('' != keyword) {
-							PremiumEditor.setFilter('keyword', keyword);
-						}
+                        if ('' != filter) {
+                            PremiumEditor.setFilter('category', filter);
+                            jQuery('#premium-modal-filters-container').find("input[value='" + filter + "']").prop('checked', true);
 
-						return;
-					}
+                        }
 
-					if ('initial' === preview) {
-						header.headerActions.empty();
-						header.headerLogo.show(new self.ModalHeaderLogo());
-						return;
-					}
+                        if ('' != keyword) {
+                            PremiumEditor.setFilter('keyword', keyword);
+                        }
 
-					this.getRegion('modalContent').show(new self.ModalPreviewView({
-						'preview': preview.get('preview'),
-						'url': preview.get('url'),
-						'notice': preview.get('notice')
-					}));
+                        return;
+                    }
 
-					header.headerLogo.empty();
-					header.headerTabs.show(new self.ModalHeaderBack());
-					header.headerActions.show(new self.ModalHeaderInsertButton({
-						model: preview
-					}));
+                    if ('initial' === preview) {
+                        header.headerActions.empty();
+                        header.headerLogo.show(new self.ModalHeaderLogo());
+                        return;
+                    }
 
-				},
+                    this.getRegion('modalContent').show(new self.ModalPreviewView({
+                        'preview': preview.get('preview'),
+                        'url': preview.get('url'),
+                        'notice': preview.get('notice')
+                    }));
 
-				getHeaderView: function () {
-					return this.getRegion('modalHeader').currentView;
-				},
+                    header.headerLogo.empty();
+                    header.headerTabs.show(new self.ModalHeaderBack());
+                    header.headerActions.show(new self.ModalHeaderInsertButton({
+                        model: preview
+                    }));
 
-				getContentView: function () {
-					return this.getRegion('modalContent').currentView;
-				},
+                },
 
-				showLoadingView: function () {
-					this.modalContent.show(new self.ModalLoadingView());
-				},
+                getHeaderView: function () {
+                    return this.getRegion('modalHeader').currentView;
+                },
 
-				showLicenseError: function () {
-					this.modalContent.show(new self.ModalErrorView());
-				},
+                getContentView: function () {
+                    return this.getRegion('modalContent').currentView;
+                },
 
-				showTemplatesView: function (templatesCollection, categoriesCollection, keywords) {
+                showLoadingView: function () {
+                    this.modalContent.show(new self.ModalLoadingView());
+                },
 
-					this.getRegion('modalContent').show(new self.ModalBodyView());
+                showLicenseError: function () {
+                    this.modalContent.show(new self.ModalErrorView());
+                },
 
-					var contentView = this.getContentView(),
-						header = this.getHeaderView(),
-						keywordsModel = new self.KeywordsModel({
-							keywords: keywords
-						});
+                showTemplatesView: function (templatesCollection, categoriesCollection, keywords) {
 
-					PremiumEditor.collections.tabs = new self.ModalTabsCollection(PremiumEditor.getTabs());
+                    this.getRegion('modalContent').show(new self.ModalBodyView());
 
-					header.headerTabs.show(new self.ModalTabsCollectionView({
-						collection: PremiumEditor.collections.tabs
-					}));
+                    var contentView = this.getContentView(),
+                        header = this.getHeaderView(),
+                        keywordsModel = new self.KeywordsModel({
+                            keywords: keywords
+                        });
 
-					contentView.contentTemplates.show(new self.ModalCollectionView({
-						collection: templatesCollection
-					}));
+                    PremiumEditor.collections.tabs = new self.ModalTabsCollection(PremiumEditor.getTabs());
 
-					contentView.contentFilters.show(new self.FiltersCollectionView({
-						collection: categoriesCollection
-					}));
+                    header.headerTabs.show(new self.ModalTabsCollectionView({
+                        collection: PremiumEditor.collections.tabs
+                    }));
 
-					contentView.contentKeywords.show(new self.KeywordsView({
-						model: keywordsModel
-					}));
+                    contentView.contentTemplates.show(new self.ModalCollectionView({
+                        collection: templatesCollection
+                    }));
 
-				}
+                    contentView.contentFilters.show(new self.FiltersCollectionView({
+                        collection: categoriesCollection
+                    }));
 
-			});
+                    contentView.contentKeywords.show(new self.KeywordsView({
+                        model: keywordsModel
+                    }));
 
-			self.ModalLoadingView = Marionette.ItemView.extend({
-				id: 'premium-template-modal-loading',
-				template: '#tmpl-premium-template-modal-loading'
-			});
+                }
 
-			self.ModalErrorView = Marionette.ItemView.extend({
-				id: 'premium-template-modal-loading',
-				template: '#tmpl-premium-template-modal-error'
-			});
+            });
 
-		},
+            self.ModalLoadingView = Marionette.ItemView.extend({
+                id: 'premium-template-modal-loading',
+                template: '#tmpl-premium-template-modal-loading'
+            });
 
-		masonry: {
+            self.ModalErrorView = Marionette.ItemView.extend({
+                id: 'premium-template-modal-loading',
+                template: '#tmpl-premium-template-modal-error'
+            });
 
-			self: {},
-			elements: {},
+        },
 
-			init: function (settings) {
+        masonry: {
 
-				var self = this;
-				self.settings = $.extend(self.getDefaultSettings(), settings);
-				self.elements = self.getDefaultElements();
+            self: {},
+            elements: {},
 
-				self.run();
-			},
+            init: function (settings) {
 
-			getSettings: function (key) {
-				if (key) {
-					return this.settings[key];
-				} else {
-					return this.settings;
-				}
-			},
+                var self = this;
+                self.settings = $.extend(self.getDefaultSettings(), settings);
+                self.elements = self.getDefaultElements();
 
-			getDefaultSettings: function () {
-				return {
-					container: null,
-					items: null,
-					columnsCount: 3,
-					verticalSpaceBetween: 30
-				};
-			},
+                self.run();
+            },
 
-			getDefaultElements: function () {
-				return {
-					$container: jQuery(this.getSettings('container')),
-					$items: jQuery(this.getSettings('items'))
-				};
-			},
+            getSettings: function (key) {
+                if (key) {
+                    return this.settings[key];
+                } else {
+                    return this.settings;
+                }
+            },
 
-			run: function () {
-				var heights = [],
-					distanceFromTop = this.elements.$container.position().top,
-					settings = this.getSettings(),
-					columnsCount = settings.columnsCount;
+            getDefaultSettings: function () {
+                return {
+                    container: null,
+                    items: null,
+                    columnsCount: 3,
+                    verticalSpaceBetween: 30
+                };
+            },
 
-				distanceFromTop += parseInt(this.elements.$container.css('margin-top'), 10);
+            getDefaultElements: function () {
+                return {
+                    $container: jQuery(this.getSettings('container')),
+                    $items: jQuery(this.getSettings('items'))
+                };
+            },
 
-				this.elements.$container.height('');
+            run: function () {
+                var heights = [],
+                    distanceFromTop = this.elements.$container.position().top,
+                    settings = this.getSettings(),
+                    columnsCount = settings.columnsCount;
 
-				this.elements.$items.each(function (index) {
-					var row = Math.floor(index / columnsCount),
-						indexAtRow = index % columnsCount,
-						$item = jQuery(this),
-						itemPosition = $item.position(),
-						itemHeight = $item[0].getBoundingClientRect().height + settings.verticalSpaceBetween;
+                distanceFromTop += parseInt(this.elements.$container.css('margin-top'), 10);
 
-					if (row) {
-						var pullHeight = itemPosition.top - distanceFromTop - heights[indexAtRow];
-						pullHeight -= parseInt($item.css('margin-top'), 10);
-						pullHeight *= -1;
-						$item.css('margin-top', pullHeight + 'px');
-						heights[indexAtRow] += itemHeight;
-					} else {
-						heights.push(itemHeight);
-					}
-				});
+                this.elements.$container.height('');
 
-				this.elements.$container.height(Math.max.apply(Math, heights));
-			}
-		}
+                this.elements.$items.each(function (index) {
+                    var row = Math.floor(index / columnsCount),
+                        indexAtRow = index % columnsCount,
+                        $item = jQuery(this),
+                        itemPosition = $item.position(),
+                        itemHeight = $item[0].getBoundingClientRect().height + settings.verticalSpaceBetween;
 
-	};
+                    if (row) {
+                        var pullHeight = itemPosition.top - distanceFromTop - heights[indexAtRow];
+                        pullHeight -= parseInt($item.css('margin-top'), 10);
+                        pullHeight *= -1;
+                        $item.css('margin-top', pullHeight + 'px');
+                        heights[indexAtRow] += itemHeight;
+                    } else {
+                        heights.push(itemHeight);
+                    }
+                });
 
-	PremiumControlsViews = {
+                this.elements.$container.height(Math.max.apply(Math, heights));
+            }
+        }
 
-		PremiumSearchView: null,
+    };
 
-		init: function () {
+    PremiumControlsViews = {
 
-			var self = this;
+        PremiumSearchView: null,
 
-			self.PremiumSearchView = window.elementor.modules.controls.BaseData.extend({
+        init: function () {
 
-				onReady: function () {
+            var self = this;
 
-					var action = this.model.attributes.action,
-						queryParams = this.model.attributes.query_params;
+            self.PremiumSearchView = window.elementor.modules.controls.BaseData.extend({
 
-					this.ui.select.find('option').each(function (index, el) {
-						$(this).attr('selected', true);
-					});
+                onReady: function () {
 
-					this.ui.select.select2({
-						ajax: {
-							url: function () {
+                    var action = this.model.attributes.action,
+                        queryParams = this.model.attributes.query_params;
 
-								var query = '';
+                    this.ui.select.find('option').each(function (index, el) {
+                        $(this).attr('selected', true);
+                    });
 
-								if (queryParams.length > 0) {
-									$.each(queryParams, function (index, param) {
+                    this.ui.select.select2({
+                        ajax: {
+                            url: function () {
 
-										if (window.elementor.settings.page.model.attributes[param]) {
-											query += '&' + param + '=' + window.elementor.settings.page.model.attributes[param];
-										}
-									});
-								}
+                                var query = '';
 
-								return ajaxurl + '?action=' + action + query;
-							},
-							dataType: 'json'
-						},
-						placeholder: 'Please enter 3 or more characters',
-						minimumInputLength: 3
-					});
+                                if (queryParams.length > 0) {
+                                    $.each(queryParams, function (index, param) {
 
-				},
+                                        if (window.elementor.settings.page.model.attributes[param]) {
+                                            query += '&' + param + '=' + window.elementor.settings.page.model.attributes[param];
+                                        }
+                                    });
+                                }
 
-				onBeforeDestroy: function () {
+                                return ajaxurl + '?action=' + action + query;
+                            },
+                            dataType: 'json'
+                        },
+                        placeholder: 'Please enter 3 or more characters',
+                        minimumInputLength: 3
+                    });
 
-					if (this.ui.select.data('select2')) {
-						this.ui.select.select2('destroy');
-					}
+                },
 
-					this.$el.remove();
-				}
+                onBeforeDestroy: function () {
 
-			});
+                    if (this.ui.select.data('select2')) {
+                        this.ui.select.select2('destroy');
+                    }
 
-			window.elementor.addControlView('premium_search', self.PremiumSearchView);
+                    this.$el.remove();
+                }
 
-		}
+            });
 
-	};
+            window.elementor.addControlView('premium_search', self.PremiumSearchView);
 
+        }
 
-	PremiumModules = {
+    };
 
-		getDataToSave: function (data) {
-			data.id = window.elementor.config.post_id;
-			return data;
-		},
 
-		init: function () {
-			if (window.elementor.settings.premium_template) {
-				window.elementor.settings.premium_template.getDataToSave = this.getDataToSave;
-			}
+    PremiumModules = {
 
-			if (window.elementor.settings.premium_page) {
-				window.elementor.settings.premium_page.getDataToSave = this.getDataToSave;
-				window.elementor.settings.premium_page.changeCallbacks = {
-					custom_header: function () {
-						this.save(function () {
-							elementor.reloadPreview();
+        getDataToSave: function (data) {
+            data.id = window.elementor.config.post_id;
+            return data;
+        },
 
-							elementor.once('preview:loaded', function () {
-								elementor.getPanelView().setPage('premium_page_settings');
-							});
-						});
-					},
-					custom_footer: function () {
-						this.save(function () {
-							elementor.reloadPreview();
+        init: function () {
+            if (window.elementor.settings.premium_template) {
+                window.elementor.settings.premium_template.getDataToSave = this.getDataToSave;
+            }
 
-							elementor.once('preview:loaded', function () {
-								elementor.getPanelView().setPage('premium_page_settings');
-							});
-						});
-					}
-				};
-			}
+            if (window.elementor.settings.premium_page) {
+                window.elementor.settings.premium_page.getDataToSave = this.getDataToSave;
+                window.elementor.settings.premium_page.changeCallbacks = {
+                    custom_header: function () {
+                        this.save(function () {
+                            elementor.reloadPreview();
 
-		}
+                            elementor.once('preview:loaded', function () {
+                                elementor.getPanelView().setPage('premium_page_settings');
+                            });
+                        });
+                    },
+                    custom_footer: function () {
+                        this.save(function () {
+                            elementor.reloadPreview();
 
-	};
+                            elementor.once('preview:loaded', function () {
+                                elementor.getPanelView().setPage('premium_page_settings');
+                            });
+                        });
+                    }
+                };
+            }
 
-	PremiumEditor = {
+        }
 
-		modal: false,
-		layout: false,
-		collections: {},
-		tabs: {},
-		defaultTab: '',
-		channels: {},
-		atIndex: null,
+    };
 
-		init: function () {
+    PremiumEditor = {
 
-			window.elementor.on(
-				'preview:loaded',
-				window._.bind(PremiumEditor.onPreviewLoaded, PremiumEditor)
-			);
+        modal: false,
+        layout: false,
+        collections: {},
+        tabs: {},
+        defaultTab: '',
+        channels: {},
+        atIndex: null,
 
-			PremiumEditorViews.init();
-			PremiumControlsViews.init();
-			PremiumModules.init();
+        init: function () {
 
-		},
+            window.elementor.on(
+                'document:loaded',
+                window._.bind(PremiumEditor.onPreviewLoaded, PremiumEditor)
+            );
 
-		onPreviewLoaded: function () {
+            PremiumEditorViews.init();
+            PremiumControlsViews.init();
+            PremiumModules.init();
 
-			this.initPremTempsButton();
+        },
 
-			window.elementor.$previewContents.on(
-				'click.addPremiumTemplate',
-				'.pa-add-section-btn',
-				_.bind(this.showTemplatesModal, this)
-			);
+        onPreviewLoaded: function () {
 
-			this.channels = {
-				templates: Backbone.Radio.channel('PREMIUM_EDITOR:templates'),
-				tabs: Backbone.Radio.channel('PREMIUM_EDITOR:tabs'),
-				layout: Backbone.Radio.channel('PREMIUM_EDITOR:layout'),
-			};
+            this.initPremTempsButton();
 
-			this.tabs = PremiumTempsData.tabs;
-			this.defaultTab = PremiumTempsData.defaultTab;
+            window.elementor.$previewContents.on(
+                'click.addPremiumTemplate',
+                '.pa-add-section-btn',
+                _.bind(this.showTemplatesModal, this)
+            );
 
-		},
+            this.channels = {
+                templates: Backbone.Radio.channel('PREMIUM_EDITOR:templates'),
+                tabs: Backbone.Radio.channel('PREMIUM_EDITOR:tabs'),
+                layout: Backbone.Radio.channel('PREMIUM_EDITOR:layout'),
+            };
 
-		initPremTempsButton: function () {
+            this.tabs = PremiumTempsData.tabs;
+            this.defaultTab = PremiumTempsData.defaultTab;
 
-			setTimeout(function () {
-				var $addNewSection = window.elementor.$previewContents.find('.elementor-add-new-section'),
-					addPremiumTemplate = "<div class='elementor-add-section-area-button pa-add-section-btn' title='Add Premium Template'><i class='eicon-star'></i></div>",
-					$addPremiumTemplate;
+        },
 
-				if ($addNewSection.length && PremiumTempsData.PremiumTemplatesBtn) {
+        initPremTempsButton: function () {
 
-					$addPremiumTemplate = $(addPremiumTemplate).prependTo($addNewSection);
-				}
+            var $addNewSection = window.elementor.$previewContents.find('.elementor-add-new-section'),
+                addPremiumTemplate = "<div class='elementor-add-section-area-button pa-add-section-btn' title='Add Premium Template'><i class='eicon-star'></i></div>",
+                $addPremiumTemplate;
 
+            if ($addNewSection.length && PremiumTempsData.PremiumTemplatesBtn) {
+                $addPremiumTemplate = $(addPremiumTemplate).prependTo($addNewSection);
+            }
 
-				window.elementor.$previewContents.on(
-					'click.addPremiumTemplate',
-					'.elementor-editor-section-settings .elementor-editor-element-add',
-					function () {
+            window.elementor.$previewContents.on(
+                'click.addPremiumTemplate',
+                '.elementor-editor-section-settings .elementor-editor-element-add',
+                function () {
 
-						var $this = $(this),
-							$section = $this.closest('.elementor-top-section'),
-							modelID = $section.data('model-cid');
+                    var $this = $(this),
+                        $section = $this.closest('.elementor-top-section'),
+                        modelID = $section.data('model-cid');
 
-						if (window.elementor.sections.currentView.collection.length) {
-							$.each(window.elementor.sections.currentView.collection.models, function (index, model) {
-								if (modelID === model.cid) {
-									PremiumEditor.atIndex = index;
-								}
-							});
-						}
+                    if (-1 !== PremiumTempsData.Elementor_Version.indexOf('3.0.')) {
+                        if (elementor.previewView.collection.length) {
+                            $.each(elementor.previewView.collection.models, function (index, model) {
+                                if (modelID === model.cid) {
+                                    PremiumEditor.atIndex = index;
+                                }
+                            });
+                        }
+                    } else {
+                        if (window.elementor.sections.currentView.collection.length) {
+                            $.each(window.elementor.sections.currentView.collection.models, function (index, model) {
+                                if (modelID === model.cid) {
+                                    PremiumEditor.atIndex = index;
+                                }
+                            });
+                        }
+                    }
 
-						if (PremiumTempsData.PremiumTemplatesBtn) {
-							setTimeout(function () {
-								var $addNew = $section.prev('.elementor-add-section').find('.elementor-add-new-section');
-								$addNew.prepend(addPremiumTemplate);
-							}, 100);
-						}
 
-					}
-				);
-			}, 100);
-		},
+                    if (PremiumTempsData.PremiumTemplatesBtn) {
+                        setTimeout(function () {
+                            var $addNew = $section.prev('.elementor-add-section').find('.elementor-add-new-section');
+                            $addNew.prepend(addPremiumTemplate);
+                        }, 100);
+                    }
 
-		getFilter: function (name) {
+                }
+            );
 
-			return this.channels.templates.request('filter:' + name);
-		},
+        },
 
-		setFilter: function (name, value) {
-			this.channels.templates.reply('filter:' + name, value);
-			this.channels.templates.trigger('filter:change');
-		},
+        getFilter: function (name) {
 
-		getTab: function () {
-			return this.channels.tabs.request('filter:tabs');
-		},
+            return this.channels.templates.request('filter:' + name);
+        },
 
-		setTab: function (value, silent) {
+        setFilter: function (name, value) {
+            this.channels.templates.reply('filter:' + name, value);
+            this.channels.templates.trigger('filter:change');
+        },
 
-			this.channels.tabs.reply('filter:tabs', value);
+        getTab: function () {
+            return this.channels.tabs.request('filter:tabs');
+        },
 
-			if (!silent) {
-				this.channels.tabs.trigger('filter:change');
-			}
+        setTab: function (value, silent) {
 
-		},
+            this.channels.tabs.reply('filter:tabs', value);
 
-		getTabs: function () {
+            if (!silent) {
+                this.channels.tabs.trigger('filter:change');
+            }
 
-			var tabs = [];
+        },
 
-			_.each(this.tabs, function (item, slug) {
-				tabs.push({
-					slug: slug,
-					title: item.title
-				});
-			});
+        getTabs: function () {
 
-			return tabs;
-		},
+            var tabs = [];
 
-		getPreview: function (name) {
-			return this.channels.layout.request('preview');
-		},
+            _.each(this.tabs, function (item, slug) {
+                tabs.push({
+                    slug: slug,
+                    title: item.title
+                });
+            });
 
-		setPreview: function (value, silent) {
+            return tabs;
+        },
 
-			this.channels.layout.reply('preview', value);
+        getPreview: function (name) {
+            return this.channels.layout.request('preview');
+        },
 
-			if (!silent) {
-				this.channels.layout.trigger('preview:change');
-			}
-		},
+        setPreview: function (value, silent) {
 
-		getKeywords: function () {
+            this.channels.layout.reply('preview', value);
 
-			var keywords = [];
+            if (!silent) {
+                this.channels.layout.trigger('preview:change');
+            }
+        },
 
-			_.each(this.keywords, function (title, slug) {
-				tabs.push({
-					slug: slug,
-					title: title
-				});
-			});
+        getKeywords: function () {
 
-			return keywords;
-		},
+            var keywords = [];
 
-		showTemplatesModal: function () {
+            _.each(this.keywords, function (title, slug) {
+                tabs.push({
+                    slug: slug,
+                    title: title
+                });
+            });
 
-			this.getModal().show();
+            return keywords;
+        },
 
-			if (!this.layout) {
-				this.layout = new PremiumEditorViews.ModalLayoutView();
-				this.layout.showLoadingView();
-			}
+        showTemplatesModal: function () {
 
-			this.setTab(this.defaultTab, true);
-			this.requestTemplates(this.defaultTab);
-			this.setPreview('initial');
+            this.getModal().show();
 
-		},
+            if (!this.layout) {
+                this.layout = new PremiumEditorViews.ModalLayoutView();
+                this.layout.showLoadingView();
+            }
 
-		requestTemplates: function (tabName) {
+            this.setTab(this.defaultTab, true);
+            this.requestTemplates(this.defaultTab);
+            this.setPreview('initial');
 
-			var self = this,
-				tab = self.tabs[tabName];
+        },
 
-			self.setFilter('category', false);
+        requestTemplates: function (tabName) {
 
-			if (tab.data.templates && tab.data.categories) {
-				self.layout.showTemplatesView(tab.data.templates, tab.data.categories, tab.data.keywords);
-			} else {
-				$.ajax({
-					url: ajaxurl,
-					type: 'get',
-					dataType: 'json',
-					data: {
-						action: 'premium_get_templates',
-						tab: tabName
-					},
-					success: function (response) {
-						console.log("%cTemplates Retrieved Successfully!!", "color: #7a7a7a; background-color: #eee;");
+            var self = this,
+                tab = self.tabs[tabName];
 
-						var templates = new PremiumEditorViews.LibraryCollection(response.data.templates),
-							categories = new PremiumEditorViews.CategoriesCollection(response.data.categories);
+            self.setFilter('category', false);
 
-						self.tabs[tabName].data = {
-							templates: templates,
-							categories: categories,
-							keywords: response.data.keywords
-						};
+            if (tab.data.templates && tab.data.categories) {
+                self.layout.showTemplatesView(tab.data.templates, tab.data.categories, tab.data.keywords);
+            } else {
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'get',
+                    dataType: 'json',
+                    data: {
+                        action: 'premium_get_templates',
+                        tab: tabName
+                    },
+                    success: function (response) {
+                        console.log("%cTemplates Retrieved Successfully!!", "color: #7a7a7a; background-color: #eee;");
 
-						self.layout.showTemplatesView(templates, categories, response.data.keywords);
+                        var templates = new PremiumEditorViews.LibraryCollection(response.data.templates),
+                            categories = new PremiumEditorViews.CategoriesCollection(response.data.categories);
 
-					}
-				});
-			}
+                        self.tabs[tabName].data = {
+                            templates: templates,
+                            categories: categories,
+                            keywords: response.data.keywords
+                        };
 
-		},
+                        self.layout.showTemplatesView(templates, categories, response.data.keywords);
 
-		closeModal: function () {
-			this.getModal().hide();
-		},
+                    }
+                });
+            }
 
-		getModal: function () {
+        },
 
-			if (!this.modal) {
-				this.modal = elementor.dialogsManager.createWidget('lightbox', {
-					id: 'premium-template-modal',
-					className: 'elementor-templates-modal',
-					closeButton: false
-				});
-			}
+        closeModal: function () {
+            this.getModal().hide();
+        },
 
-			return this.modal;
+        getModal: function () {
 
-		}
+            if (!this.modal) {
+                this.modal = elementor.dialogsManager.createWidget('lightbox', {
+                    id: 'premium-template-modal',
+                    className: 'elementor-templates-modal',
+                    closeButton: false
+                });
+            }
 
-	};
+            return this.modal;
 
-	$(window).on('elementor:init', PremiumEditor.init);
+        }
+
+    };
+
+    $(window).on('elementor:init', PremiumEditor.init);
 
 })(jQuery);

@@ -125,15 +125,23 @@ th.column-published, th.column-modified {
     width: 20px;
     height: 20px;
 }
+.button-left, .button-right {
+    display: inline-block;
+}
 i.ccj-i-fullscreen:before {
     content: "\f211";
+}
+i.ccj-i-find:before {
+    content: "Find";
+}
+i.ccj-i-beautifier:before {
+    content: "\f100";
 }
 
 .code-mirror-before {
     border: 1px solid #ddd;
     border-bottom: none;
     background-color: #f7f7f7;
-    margin-top: 24px;
 }
 .code-mirror-before div {
     color: #8F8F8F;
@@ -384,6 +392,12 @@ height: 3px;
     width: 200px;
     padding: 10px;
     margin-left: -110px;
+}
+.CodeMirror-fullscreen {
+  position: fixed !important;
+  top: 0; left: 0; right: 0; bottom: 0;
+  height: auto;
+  z-index: 100004;
 }
 pre.CodeMirror-line {
     direction: ltr;

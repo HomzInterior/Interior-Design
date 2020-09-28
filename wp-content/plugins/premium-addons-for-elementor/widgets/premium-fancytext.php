@@ -111,7 +111,7 @@ class Premium_Fancytext extends Widget_Base {
                         'premium_text_strings_text_field' => __( 'Awesome', 'premium-addons-for-elementor' ),
                         ],
                     ],
-                'fields'        => array_values( $repeater->get_controls() ),
+                'fields'        => $repeater->get_controls(),
                 'title_field'   => '{{{ premium_text_strings_text_field }}}',
             ]
         );
@@ -207,12 +207,12 @@ class Premium_Fancytext extends Widget_Base {
             [
                 'label'         => __('Animation Speed', 'premium-addons-for-elementor'),
                 'type'          => Controls_Manager::NUMBER,
-                'description'   => __('Set animation speed in seconds.', 'premium-addons-for-elementor'),
+                'description'   => __('Set animation speed in milliseconds. Default value is 1000', 'premium-addons-for-elementor'),
                 'condition'     => [
                     'premium_fancy_text_effect!' => [ 'typing', 'slide' ],
                 ],
                 'selectors'     => [
-                    '{{WRAPPER}} .premium-fancy-text-wrapper:not(.typing):not(.slide) .premium-fancy-list-items'   => 'animation-duration: {{VALUE}}s'
+                    '{{WRAPPER}} .premium-fancy-text-wrapper:not(.typing):not(.slide) .premium-fancy-list-items'   => 'animation-duration: {{VALUE}}ms'
                 ]
             ]
         );
@@ -221,7 +221,7 @@ class Premium_Fancytext extends Widget_Base {
             [
                 'label'         => __('Animation Delay', 'premium-addons-for-elementor'),
                 'type'          => Controls_Manager::NUMBER,
-                'description'   => __('Set animation speed in seconds.', 'premium-addons-for-elementor'),
+                'description'   => __('Set animation delay in milliseconds.Default value is 2500', 'premium-addons-for-elementor'),
                 'condition'     => [
                     'premium_fancy_text_effect!' => [ 'typing', 'slide' ],
                 ]
@@ -700,6 +700,9 @@ class Premium_Fancytext extends Widget_Base {
             
             
         } else if ( 'slide' === effect ) {
+
+            view.addRenderAttribute( 'prefix', 'class', 'premium-fancy-text-span-align' );
+            view.addRenderAttribute( 'suffix', 'class', 'premium-fancy-text-span-align' );
         
             var mausePause = 'yes' === settings.premium_slide_up_hover_pause ? true : false;
             
@@ -709,9 +712,6 @@ class Premium_Fancytext extends Widget_Base {
             fancyTextSettings.mousePause    = mausePause
            
         } else {
-            
-            view.addRenderAttribute( 'prefix', 'class', 'premium-fancy-text-span-align' );
-            view.addRenderAttribute( 'suffix', 'class', 'premium-fancy-text-span-align' );
             
             fancyTextSettings.delay         = settings.premium_fancy_text_zoom_delay;
             fancyTextSettings.count         = settings.loop_count;

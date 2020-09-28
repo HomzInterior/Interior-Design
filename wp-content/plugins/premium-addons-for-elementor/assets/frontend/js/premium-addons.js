@@ -153,6 +153,7 @@
 
         var $videoBoxElement = $scope.find(".premium-video-box-container"),
             $videoContainer = $videoBoxElement.find(".premium-video-box-video-container"),
+            $videoInnerContainer = $videoBoxElement.find('.premium-video-box-inner-wrap'),
             type = $videoBoxElement.data("type"),
             thumbnail = $videoBoxElement.data("thumbnail"),
             video, vidSrc;
@@ -215,6 +216,7 @@
         $videoBoxElement.on("click", function () {
             playVideo();
         });
+
     };
 
     /****** Premium Media Grid Handler ******/
@@ -508,7 +510,7 @@
                     current = 1;
 
                 //Get effect settings
-                var delay = (settings.delay || 2.5) * 1000,
+                var delay = settings.delay || 2500,
                     loopCount = settings.count;
 
                 //If Loop Count option is set
@@ -782,9 +784,6 @@
                 centerMode = slick.options.centerMode,
                 slideToAnimate = currentSlide + slidesToShow - 1;
 
-            //Reset Aniamtions for the other slides
-            resetAnimations();
-
             //Trigger Aniamtions for the current slide
             triggerAnimation();
 
@@ -811,6 +810,9 @@
         });
 
         $carouselElem.on("beforeChange", function (event, slick, currentSlide) {
+
+            //Reset Aniamtions for the other slides
+            resetAnimations();
 
             var $inViewPort = $(this).find("[data-slick-index='" + currentSlide + "']");
 
@@ -1102,6 +1104,7 @@
         }
     };
 
+
     /****** Premium Contact Form 7 Handler ******/
     var PremiumContactFormHandler = function ($scope, $) {
 
@@ -1179,6 +1182,90 @@
         });
     };
 
+    /****** Premium Title Handler ******/
+    var PremiumTitleHandler = function ($scope, $) {
+
+        var $titleContainer = $scope.find(".premium-title-container"),
+            $titleElement = $titleContainer.find('.premium-title-text');
+
+        if ($titleContainer.hasClass('style9')) {
+            var $style9 = $scope.find(".premium-title-style9");
+
+            $style9.each(function () {
+                var elm = $(this);
+                var holdTime = elm.attr('data-blur-delay') * 1000;
+                elm.attr('data-animation-blur', 'process')
+                elm.find('.premium-title-style9-letter').each(function (index, letter) {
+                    index += 1;
+                    var animateDelay;
+                    if ($('body').hasClass('rtl')) {
+                        animateDelay = 0.2 / index + 's';
+                    }
+                    else {
+                        animateDelay = index / 20 + 's';
+                    }
+                    $(letter).css({ '-webkit-animation-delay': animateDelay, 'animation-delay': animateDelay });
+                })
+                setInterval(function () {
+                    elm.attr('data-animation-blur', 'done')
+                    setTimeout(function () {
+                        elm.attr('data-animation-blur', 'process')
+                    }, 150);
+                }, holdTime);
+            });
+        }
+
+
+        if ($titleContainer.hasClass('style8')) {
+
+            var holdTime = $titleElement.attr('data-shiny-delay') * 1000,
+                duration = $titleElement.attr('data-shiny-dur') * 1000;
+
+            function shinyEffect() {
+                $titleElement.get(0).setAttribute('data-animation', 'shiny');
+                setTimeout(function () {
+                    $titleElement.removeAttr('data-animation')
+                }, duration);
+            }
+
+            (function repeat() {
+                shinyEffect();
+                setTimeout(repeat, holdTime);
+            })();
+        }
+
+    };
+
+
+    /****** Premium Icon List Handler ******/
+    var PremiumIconListHandler = function ($scope, $) {
+
+        var $listItems = $scope.find(".premium-icon-list-box"),
+            items = $listItems.find(".premium-icon-list-content");
+
+        items
+            .each(function (index, item) {
+                if ($listItems.data("list-animation") && " " != $listItems.data("list-animation")) {
+                    var waypoint = new Waypoint({
+                        element: item,
+                        handler: function () {
+                            var element = $(this.element),
+                                delay = element.data('delay');
+                            setTimeout(function () {
+                                element.next('.premium-icon-list-divider , .premium-icon-list-divider-inline').css("opacity", "1");
+                                element.next('.premium-icon-list-divider-inline , .premium-icon-list-divider').addClass("animated " + $listItems.data("list-animation"));
+                                element.css("opacity", "1"),
+                                    element.addClass("animated " + $listItems.data("list-animation"));
+                            }, delay);
+                            this.destroy();
+                        },
+                        offset: Waypoint.viewportHeight() - 150,
+                    });
+                }
+            });
+    };
+
+
     //Elementor JS Hooks
     $(window).on("elementor/frontend/init", function () {
 
@@ -1186,6 +1273,7 @@
         elementorFrontend.hooks.addAction("frontend/element_ready/premium-img-gallery.default", PremiumGridWidgetHandler);
         elementorFrontend.hooks.addAction("frontend/element_ready/premium-addon-fancy-text.default", PremiumFancyTextHandler);
         elementorFrontend.hooks.addAction("frontend/element_ready/premium-counter.default", PremiumCounterHandler);
+        elementorFrontend.hooks.addAction("frontend/element_ready/premium-addon-title.default", PremiumTitleHandler);
         elementorFrontend.hooks.addAction("frontend/element_ready/premium-countdown-timer.default", PremiumCountDownHandler);
         elementorFrontend.hooks.addAction("frontend/element_ready/premium-carousel-widget.default", PremiumCarouselHandler);
         elementorFrontend.hooks.addAction("frontend/element_ready/premium-addon-banner.default", PremiumBannerHandler);
@@ -1194,6 +1282,7 @@
         elementorFrontend.hooks.addAction("frontend/element_ready/premium-image-scroll.default", PremiumImageScrollHandler);
         elementorFrontend.hooks.addAction("frontend/element_ready/premium-contact-form.default", PremiumContactFormHandler);
         elementorFrontend.hooks.addAction("frontend/element_ready/premium-addon-person.default", PremiumTeamMembersHandler);
+        elementorFrontend.hooks.addAction("frontend/element_ready/premium-icon-list.default", PremiumIconListHandler);
 
 
         if (elementorFrontend.isEditMode()) {

@@ -55,7 +55,8 @@ class Premium_Title extends Widget_Base {
 
     public function get_script_depends() {
         return [
-            'lottie-js'
+            'premium-addons-js',
+            'lottie-js',
         ];
     }
 
@@ -108,6 +109,8 @@ class Premium_Title extends Widget_Base {
                     'style5'        => __('Style 5', 'premium-addons-for-elementor'),
                     'style6'        => __('Style 6', 'premium-addons-for-elementor'),
                     'style7'        => __('Style 7', 'premium-addons-for-elementor'),
+                    // 'style8'        => __('Style 8', 'premium-addons-for-elementor'),
+                    // 'style9'        => __('Style 9', 'premium-addons-for-elementor'),
                 ],
                 'label_block'   => true,
             ]
@@ -279,7 +282,7 @@ class Premium_Title extends Widget_Base {
             ]
         );
 
-        $inline_flex = [ 'style1', 'style2', 'style5', 'style6', 'style7' ];
+        $inline_flex = [ 'style1', 'style2', 'style5', 'style6', 'style7' , 'style8' , 'style9'];
         
         $this->add_responsive_control('premium_title_align',
             [
@@ -549,7 +552,33 @@ class Premium_Title extends Widget_Base {
                 ],
                 'selectors'     => [
                     '{{WRAPPER}} .premium-title-header' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .premium-title-style8 .premium-title-text[data-animation="shiny"]' => '--base-color: {{VALUE}} ',
                 ],
+            ]
+        );
+
+        $this->add_control(
+            'premium_title_blur_color',
+            [
+                'label' => esc_html__('Blur Color', 'booster-addons'),
+                'type' => Controls_Manager::COLOR,
+                'default' => '#000',
+                'selectors' => ['{{WRAPPER}} .premium-title-header' => '--shadow-color: {{VALUE}};'],
+                'condition' => [
+					'premium_title_style' => 'style9',
+                ],
+            ]
+        );
+
+        $this->add_control('shining_shiny_color_title',
+            [
+                'label'         => __('Shiny Color', 'premium-addons-for-elementor'),
+                'type'          => Controls_Manager::COLOR,
+                'default'       => '#fff',
+                'condition' => [
+					'premium_title_style' => 'style8',
+                ],
+                'selectors' => ['{{WRAPPER}} .premium-title-style8 .premium-title-text[data-animation="shiny"]' => '--shiny-color: {{VALUE}}'],
             ]
         );
         
@@ -694,7 +723,54 @@ class Premium_Title extends Widget_Base {
                 'selector'      => '{{WRAPPER}} .premium-title-header'
             ]
         );
-        
+
+        $this->add_control('premium_title_shadow_value',
+            [
+                'label' => esc_html__('Blur Shadow Value (px)', 'booster-addons'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => '10', 'max' => '500',  'step' => '10', 
+                'dynamic' => ['active' => true],
+                'selectors' => ['{{WRAPPER}} .premium-title-header' => '--shadow-value: {{VALUE}}px;'],
+                'default' => '120',
+                'condition' => [
+					'premium_title_style' => 'style9',
+                ],
+            ]
+        );
+
+        $this->add_control('premium_title_delay',
+            [
+                'label'     => esc_html__('Animation Delay (s)', 'premium-addons-for-elementor'),
+                'type'      => Controls_Manager::NUMBER,
+                'min'       => '1',
+                'max'       => '30',
+                'step'      => 0.5,
+                'condition' => [
+					'premium_title_style' => ['style8','style9'],
+                ],
+                'render_type'   => 'template',
+                'dynamic'   => ['active' => true],
+                'default'   => '2'
+            ]
+        );
+
+        $this->add_control('shining_animation_duration',
+            [
+                'label'         => __( 'Animation Duration (s)', 'premium-addons-for-elementor' ),
+                'type'          => Controls_Manager::NUMBER,
+                'default'       => '1',
+                'step'          => 0.5,
+                'condition'     => [
+                    'premium_title_style' => 'style8'
+                ],
+                'frontend_available' => true,
+                'render_type'   => 'template',
+                'selectors'     => [
+                    '{{WRAPPER}} .premium-title-style8 .premium-title-text[data-animation="shiny"]' => '--animation-speed: {{VALUE}}s ',
+                ]
+            ]
+        );
+
         $this->add_responsive_control('premium_title_margin', 
             [
                 'label'         => __('Margin', 'premium-addons-for-elementor'),
@@ -859,6 +935,20 @@ class Premium_Title extends Widget_Base {
         $this->add_render_attribute( 'container', 'class', [ 'premium-title-container', $selected_style ] );
         
         $this->add_render_attribute( 'title', 'class', [ 'premium-title-header', 'premium-title-' . $selected_style ] );
+
+        if ( $selected_style === 'style9' ) {
+
+            $this->add_render_attribute( 'title', 'data-blur-delay', $settings['premium_title_delay'] );
+
+        }
+        if($selected_style === 'style8'){
+
+            $this->add_render_attribute( 'premium_title_text', 'data-shiny-delay', $settings['premium_title_delay'] );
+            $this->add_render_attribute( 'premium_title_text', 'data-shiny-dur', $settings['shining_animation_duration'] );
+
+        }
+
+        $icon_position = '';
         
         if( 'yes' === $settings['premium_title_icon_switcher'] ) {
 
@@ -959,10 +1049,22 @@ class Premium_Title extends Widget_Base {
                     </span>
                 <?php endif; ?>
             <?php endif; ?>
-
-            <span <?php echo $this->get_render_attribute_string('premium_title_text'); ?>>
+            <?php if( $selected_style !== 'style9' ) :?>
+            <span <?php echo $this->get_render_attribute_string('premium_title_text'); ?> >
                 <?php echo esc_html( $settings['premium_title_text'] ); ?>
             </span>
+            <?php else: 
+                     $letters_html = '<span class="premium-letters-container"'.$this->get_render_attribute_string('premium_title_text').'>';   
+                     $title_array = str_split(esc_html($settings['premium_title_text']));
+                     foreach ($title_array as $key => $letter):    
+                         $key = $key+1;                
+                         $letters_html .='<span class="premium-title-style9-letter" data-letter-index="'.esc_attr($key+1).'" data-letter="'.esc_attr($letter).'">'.$letter.'</span>';
+                     endforeach;
+                     $the_title = $letters_html.'</span>';
+                     echo $the_title;
+            ?>
+            <?php endif; ?>
+
             <?php if ( $selected_style === 'style7' ) : ?>
                 </div>
             <?php endif; ?>
@@ -1002,7 +1104,16 @@ class Premium_Title extends Widget_Base {
             view.addRenderAttribute( 'premium_title_container', 'class', [ 'premium-title-container', selectedStyle ] );
             
             view.addRenderAttribute( 'premium_title', 'class', [ 'premium-title-header', 'premium-title-' + selectedStyle ] );
-            
+
+            if ( selectedStyle === 'style9' ) {
+                view.addRenderAttribute( 'premium_title', 'data-blur-delay', settings.premium_title_delay );
+            }
+
+            if( selectedStyle  === 'style8'){
+                view.addRenderAttribute( 'premium_title_text', 'data-shiny-delay', settings.premium_title_delay );
+                view.addRenderAttribute( 'premium_title_text', 'data-shiny-dur', settings.shining_animation_duration );
+            }
+                
             view.addRenderAttribute( 'icon', 'class', [ 'premium-title-icon', titleIcon ] );
             
             if( 'yes' === settings.premium_title_icon_switcher ) {
@@ -1050,8 +1161,7 @@ class Premium_Title extends Widget_Base {
 
                 view.addRenderAttribute( 'link', 'href', link );
 
-            }
-        
+            }        
         #>
         <div {{{ view.getRenderAttributeString('premium_title_container') }}}>
             <{{{titleTag}}} {{{view.getRenderAttributeString('premium_title')}}}>
@@ -1083,7 +1193,22 @@ class Premium_Title extends Widget_Base {
                         </span>
                     <# } #>
                 <# } #>
-                <span {{{ view.getRenderAttributeString('premium_title_text') }}}>{{{ titleText }}}</span>
+                <# if( selectedStyle !== 'style9' ) {#>
+                <span {{{ view.getRenderAttributeString('premium_title_text') }}} >{{{ titleText }}}</span>
+                <# } else {
+                     lettersHtml = '<span class="premium-letters-container"'+ view.getRenderAttributeString('premium_title_text') +'>';  
+                     text =  titleText  ; 
+                     titleArray = text.split('');
+                     key=0;
+                     titleArray.forEach(function (item) { 
+                         key = key+1;                
+                         lettersHtml +='<span class="premium-title-style9-letter" data-letter-index="'+(key+1)+'" data-letter="'+(item)+'">'+item+'</span>';
+                    }); 
+                    theTitle = lettersHtml+'</span>'; #>
+                     {{{theTitle}}}
+                     <#
+                    }
+                #>
                 <# if( 'style7' === selectedStyle ) { #>
                     </div>
                 <# } #>

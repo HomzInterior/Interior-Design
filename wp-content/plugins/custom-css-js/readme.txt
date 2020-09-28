@@ -5,7 +5,7 @@ Email: diana@burduja.eu
 Tags: CSS, JS, javascript, custom CSS, custom JS, custom style, site css, add style, customize theme, custom code, external css, css3, style, styles, stylesheet, theme, editor, design, admin
 Requires at least: 3.0.1
 Tested up to: 5.5 
-Stable tag: 3.32.3
+Stable tag: 3.33
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 5.2.4
@@ -104,6 +104,14 @@ The URL for the linked Codes is built just like the URL for other media (from Me
 $. Add/Edit HTML 
 
 == Changelog ==
+
+= 3.33 =
+* 08/20/2020
+* Fix: the user language preferrence was ignored in favor of the site defined language
+* Fix: allow the jQuery library added by plugins like Enable jQuery Migrate Helper or Test jQuery Updates
+* Fix: permalink was not editable with WordPress 5.5
+* Feature: fullscreen editor
+* Feature: button for beautifying the code
 
 = 3.32.3 =
 * 08/02/2020
