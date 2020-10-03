@@ -2,7 +2,7 @@
 # This file is distributed under the GNU General Public License v2.0 or later.=!>
 msgid ""
 msgstr ""
-"Project-Id-Version: OceanWP 1.8.9\n"
+"Project-Id-Version: OceanWP 1.9.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/oceanwp\n"
 "POT-Creation-Date: 2020-09-14 03:18:58+00:00\n"
 "MIME-Version: 1.0\n"

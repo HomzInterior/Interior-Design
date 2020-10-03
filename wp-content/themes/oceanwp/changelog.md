@@ -1,5 +1,8 @@
 # OceanWP Changelog
 
+### *2020.09.30* - 1.9.0:
+* **Fixed** - Some codes for the Freemius.
+
 ### *2020.09.14* - 1.8.9:
 * **Fixed** - Keyboard navigation improvement for mobile menu.
 

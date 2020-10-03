@@ -2,9 +2,9 @@
 Contributors: oceanwp, apprimit
 Tags: widgets, meta box, metaboxes, metabox, oceanwp
 Requires at least: 5.3
-Tested up to: 5.4.2
-Stable tag: 1.6.5
-Requires PHP: 7.0
+Tested up to: 5.5
+Stable tag: 1.6.6
+Requires PHP: 7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,6 +32,11 @@ This plugin will only function with the [OceanWP](https://oceanwp.org/) theme.
 3. Custom CSS.
 
 == Changelog ==
+
+= 1.6.6 =
+- Fixed: Security issue - If $_REQUEST['_wpnonce'] is not set, it won't be checked.
+- Fixed: Remove filter for 5 star rating from review link.
+- Updated: Freemius version.
 
 = 1.6.5 =
 - Fixed: Data saving error - about me widget.
